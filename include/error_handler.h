@@ -8,12 +8,12 @@ void fileNotFound() {
 }
 
 void invalidHeader() {
-    fprintf(stderr, "%s", "Cabecera de archivo invalida\n");
+    fprintf(stderr, "%s", "Cabecera de archivo inválida\n");
     exit(EXIT_FAILURE);
 } 
 
 void invalidInstruction() {
-    fprintf(stderr, "%s", "Instrucción invalida\n");
+    fprintf(stderr, "%s", "Instrucción inválida\n");
     exit(EXIT_FAILURE);
 }
 
@@ -22,7 +22,7 @@ void segmentationFault() {
     exit(EXIT_FAILURE);
 }
 
-void divitionByZero() {
+void divisionByZero() {
     fprintf(stderr, "%s", "Error de división por cero\n");
     exit(EXIT_FAILURE);
 }
