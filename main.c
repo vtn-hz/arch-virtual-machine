@@ -11,20 +11,20 @@ int main(int argc, char** argv){
 
 void getParsed()
 {
+    int sizeFile;
 }
 
-void readIdentifier(FILE *file) //asume que existe archivo
+void readIdentifier(FILE *file,int* sizeFile) //asume que existe archivo
 {
-    int sizeFile;
     char title[8];
     file = fopen("sample.vmx", "rb"); //revise formats
     fread(title,sizeof(char),8,file); //works and read what it has to
     printf("%s",title); 
 
-    sizeFile = ((unsigned char)title[6] <<8) | (unsigned char)title[7]; //save the size
-    printf("%d",sizeFile);
+    (*sizeFile) = ((unsigned char)title[6] <<8) | (unsigned char)title[7]; //save the size
+    //printf("%d",sizeFile);
 
-    if( !strcmp(title,"VMX25"))
+    if( !strncmp(title,"VMX25",5))
         errorHandler; //array to functions for errors
 }
 
