@@ -5,7 +5,7 @@
 int main(int argc, char** argv){
 
     FILE *file= fopen("sample.vmx","rb");
-    readIdentifier(file);
+    //readIdentifier(file);
     return 0;
 }
 
@@ -25,7 +25,9 @@ void readIdentifier(FILE *file,int* sizeFile) //asume que existe archivo
     //printf("%d",sizeFile);
 
     if( !strncmp(title,"VMX25",5))
-        errorHandler; //array to functions for errors
+    {
+        
+    }
+        //errorHandler; //array to functions for errors
 }
-
 
