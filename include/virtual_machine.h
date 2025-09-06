@@ -41,4 +41,6 @@ VirtualMachine* createVm (int codeSegmentSize );
  */
 void vmSetUp (VirtualMachine*);
 
+void releaseVm(VirtualMachine*);
+
 #endif

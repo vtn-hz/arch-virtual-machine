@@ -40,4 +40,7 @@ void vmSetUp (VirtualMachine* virtualM) {
     reg[ IP ] = reg[ CS ];
 }
 
-
+void releaseVm (VirtualMachine* virtualM) {
+    free(virtualM->mem);
+    free(virtualM);
+}
