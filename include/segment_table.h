@@ -1,5 +1,5 @@
-#ifndef __SEGMENT_TABLE__
-#define __SEGMENT_TABLE__
+#ifndef SEGMENT_TABLE_H
+#define SEGMENT_TABLE_H
 
 typedef struct {
     unsigned short base;

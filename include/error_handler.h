@@ -1,5 +1,5 @@
-#ifndef __ERROR_HANDLER__ 
-#define __ERROR_HANDLER__
+#ifndef ERROR_HANDLER_H 
+#define ERROR_HANDLER_H
 
 void fileNotFound();
 void invalidHeader();
