@@ -2,7 +2,12 @@
 #define VIRTUAL_MACHINE_H
 
 #include "segment_table.h"
+
 #include "instructions.h"
+
+#include "common_registers.h"
+
+#define MEMORY_SIZE 16384 
 
 typedef struct VirtualMachine {
     char* mem;
@@ -29,7 +34,7 @@ typedef struct VirtualMachine {
  * 
  * @return VirtualMachine*
  */
-VirtualMachine* createVm (int sizeCodeSegement);
+VirtualMachine* createVm (int codeSegmentSize );
 
 /**
  * inicializa los registros CS, DS, IP
