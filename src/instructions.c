@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <instructions.h>
 
-void instructor() {
-    char c;
+void getInstruction(FILE *, char *, char *, char *, int *);
 
+void instructor() {
     FILE * vmx25 = fopen("test/sample.vmx", "rb");
     
     if (!vmx25) {
@@ -14,18 +14,31 @@ void instructor() {
         // advance pointer to instruction
         fseek(vmx25, sizeof(char)*8, 0); // 50_16 = 01010000_2
 
-        fread(&c, sizeof(char), 1, vmx25);
-        char cod = c & 0x0F; // 00001111
+        char cod, op1, op2;
+        int n; // unnecessary?
 
-        // according to the mnemonic, change the operand types (and shifts)
-        c >>= 4;
-        char op2 = c & 0x03; // 00000011
-        c >>= 2;
-        char op1 = c & 0x03;
+        getInstruction(vmx25, &cod, &op1, &op2, &n);
 
-        // save operands
-        printf("%02X, %02X, %02X\n", cod, op1, op2);
+        // process information
+        printf("Mnm: %02X\nOp1: %02X\nOp2: %02X\nOp#: %d\n", cod, op1, op2, n);
     }
 
     fclose(vmx25);
+}
+
+void getInstruction(FILE * f, char * cod, char * op1, char * op2, int * n) {
+    char c;
+    fread(&c, sizeof(char), 1, f);
+    *cod = c & 0x1F; // 00011111
+
+    c >>= 4;
+    if (c & 0x01) {
+        *op1 = c & 0x03;
+        *op2 = c >> 2 & 0x03;
+        *n = 2;
+    } else {
+        *op1 = c >> 2 & 0x03;
+        *op2 = 0;
+        *n = *op1 > 0;
+    }
 }
