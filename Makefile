@@ -7,8 +7,8 @@ SRC_DIR = src
 BIN_DIR = bin
 
 # Archivos fuente y objetos
-SRC = $(wildcard $(SRC_DIR)/*.c)
-OBJ = $(SRC:.c=.o)
+SRC = $(wildcard $(SRC_DIR)/*.c) # Todos los .c en src
+OBJ = $(SRC:.c=.o) # Cambia .c por .o
 
 # Nombre del ejecutable
 TARGET = $(BIN_DIR)/vmx
