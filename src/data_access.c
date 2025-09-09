@@ -69,3 +69,24 @@ void initializeGetters () {
     availableDataGetter[2] = getDataFromInmediato;
     availableDataGetter[3] = getDataFromMemory;
 }
+
+// testing main 
+/*
+
+int main(int argc, char** argv) {
+    VirtualMachine* virtual = createVm ( 20 );
+    vmSetUp( virtual );
+
+    // 1111 1111 1111 1100 -> -4
+    virtual->mem[20] = 0xFF;
+    virtual->mem[21] = 0xFF;
+    virtual->mem[22] = 0x00;
+
+
+    int operand = 0x031B0000;
+    int value = getData(virtual, operand, 3);
+    printf("\n\nvalue: %d\n", value);
+    releaseVm( virtual );
+    return 0;
+}
+*/
