@@ -31,6 +31,7 @@ VirtualMachine* createVm ( int codeSegmentSize ) {
  */
 void vmSetUp (VirtualMachine* virtualM) {
     initializeGetters();
+    initializeSetters();
 
     int *reg = virtualM->reg;
 

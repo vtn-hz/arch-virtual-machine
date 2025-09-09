@@ -4,14 +4,9 @@
 #include "virtual_machine.h"
 #include "error_handler.h"
 
-void initializeSetters();
-void initializeGetters(void);
-
-typedef int(*p_getter_data)(VirtualMachine*, int operand, int bytes);
-typedef void(*p_setter_data)(VirtualMachine*, int operand, int value, int bytes);
-
 static p_getter_data availableDataGetter[4];
-// static p_setter_data availableDataSetter[4];
+
+static p_setter_data availableDataSetter[4];
 
 // utils/...
 int extractOperationType ( int operand ) {
@@ -63,11 +58,25 @@ int getDataFromMemory (VirtualMachine *virtualM, int operand, int bytes) {
     return (readedData << (32-bytes*8)) >> (32-bytes*8);
 }
 
+
+void setData(VirtualMachine*, int operand, int value, int bytes) {
+
+}   
+
+
+void setDataToMemory(VirtualMachine*, int operand, int value, int bytes) {
+
+}
+
 void initializeGetters () {
     availableDataGetter[0] = NULL;
     availableDataGetter[1] = getDataFromRegister;
     availableDataGetter[2] = getDataFromInmediato;
     availableDataGetter[3] = getDataFromMemory;
+}
+
+void initializeSetters () {
+    availableDataSetter[3] = setDataToMemory;
 }
 
 // testing main 
