@@ -1,10 +1,11 @@
 #include <stdlib.h>
 
 #include "virtual_machine.h"
+#include "data_access.h"
 
 VirtualMachine* createVm ( int codeSegmentSize ) {
     VirtualMachine* virtualM = (VirtualMachine*) malloc( sizeof(VirtualMachine) );
-    virtualM->mem = (char*) malloc( MEMORY_SIZE );
+    virtualM->mem = (unsigned char*) malloc( MEMORY_SIZE );
 
 
     /**
@@ -29,6 +30,8 @@ VirtualMachine* createVm ( int codeSegmentSize ) {
  * por el momento asume 0 y 1
  */
 void vmSetUp (VirtualMachine* virtualM) {
+    initializeGetters();
+
     int *reg = virtualM->reg;
 
     int cs = 0;
