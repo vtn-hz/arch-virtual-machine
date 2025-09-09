@@ -1,35 +1,11 @@
-/**
-* migrate implementation to .c later (preguntar)
-*/
+#ifndef ERROR_HANDLER_H 
+#define ERROR_HANDLER_H
 
-#ifndef __ERROR_HANDLER__ 
-#define __ERROR_HANDLER__
-
-void fileNotFound() {
-    fprintf(stderr, "%s", "No se encontró el archivo\n");
-    exit(EXIT_FAILURE);
-}
-
-void invalidHeader() {
-    fprintf(stderr, "%s", "Cabecera de archivo inválida\n");
-    exit(EXIT_FAILURE);
-} 
-
-void invalidInstruction() {
-    fprintf(stderr, "%s", "Instrucción inválida\n");
-    exit(EXIT_FAILURE);
-}
-
-void segmentationFault() {
-    fprintf(stderr, "%s", "Error de segmentación\n");
-    exit(EXIT_FAILURE);
-}
-
-void divisionByZero() {
-    fprintf(stderr, "%s", "Error de división por cero\n");
-    exit(EXIT_FAILURE);
-}
-
+void fileNotFound();
+void invalidHeader();
+void invalidInstruction();
+void segmentationFault();
+void divisionByZero();
 
 /** 
 *   todo: add more parameters to send
@@ -37,18 +13,14 @@ void divisionByZero() {
 */
 typedef void(*p_error_handler)();
 
-struct {
+typedef struct {
     p_error_handler fileNotFound; 
     p_error_handler invalidHeader;
     p_error_handler invalidInstruction;
     p_error_handler segmentationFault;
     p_error_handler divisionByZero;
-} error_handler = {
-    fileNotFound, 
-    invalidHeader, 
-    invalidInstruction,
-    segmentationFault, 
-    divisionByZero
-};
+} ErrorHandler;
 
-#endif 
+extern ErrorHandler error_handler;
+
+#endif
