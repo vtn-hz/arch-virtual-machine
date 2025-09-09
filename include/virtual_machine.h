@@ -10,26 +10,15 @@
 #define MEMORY_SIZE 16384 
 
 typedef struct VirtualMachine {
-    char* mem;
-    int reg[32];
-    // POSIBLE CAMBIO
-    ST table_seg[8];  // TSS *table_segs
-    /**
-     * Se podria llegar a tratar internamente
-     * como una pila, donde al agregar un nuevo
-     * segmento suma el valor del anterior
-     * teniendo un "tope" 
-     * 
-     * TSS->add( size ) : return TS
-     * TSS->getTs( indice ) : TS
-     */
-
+    char* memory;
+    int registers[32];
+    DST segment_table;
 
     p_instruction instructions[32];
 } VirtualMachine;
 
 /**
- * - instancia la vm, reserva 2^10*16 en memoria (*mem)
+ * - instancia la vm, reserva 2^10*16 en memoria (*memory)
  * - crea los correspondientes segmentos
  * 
  * @return VirtualMachine*
