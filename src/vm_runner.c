@@ -1,7 +1,9 @@
+#include <stdlib.h>
 #include "vm_runner.h"
-
 #include "error_handler.h"
 #include "virtual_machine.h"
+#include "segment_table.h"
+
 
 int isSegmentCodeEnded(VirtualMachine*);
 
@@ -21,24 +23,10 @@ void virtualMachineRun(VirtualMachine* virtualM) {
  * habria que agregarle una capa mas
  * a segment_table, de manera que se pueda
  * utilizar mas sencillo 
- * 
  * esta manera podria ser un ejemplo
  */
-int isSegmentCodeEnded(VirtualMachine* virtualM) {
-    /** 
-     * lo ideal seria solamente tener que enviar 
-     * la memoria y que automaticamente detecte
-     * el segmento con la validacion que exista el 
-     * segmento.
-     */
-    int ipContent = virtualM->reg[ CS ]; 
-
-    // se podria hacer un /utils para esto
-    // tiene pinta que se va a usar permanentemente
-    int stIndex = (address >> 16) & 0xFFFF;
-    int offset = address & 0xFFFF;
-    
-    return isAccessAllowed(virtualM->table_seg[stIndex], offset);
+int isSegmentCodeEnded(VirtualMachine* virtualM) {    
+    return isLogicalAddressValid(virtualM->segment_table, virtualM->registers[IP]);
 }
 
 void prepareInstruction(VirtualMachine* virtualM) {
@@ -56,13 +44,13 @@ void advanceInstructionPointer(VirtualMachine* virtualM) {
 }
 
 void executeInstruction(VirtualMachine* virtualM){
-    int requestedInstruction = virtualM->reg[OPC];
+    int requestedInstruction = virtualM->registers[OPC];
     
     if (!(0 <= requestedInstruction && requestedInstruction <= 31)) {
         error_handler.invalidInstruction();
     }
 
-    if (virtualM->p_instructions[ requestedInstruction ] == NULL) {
+    if (virtualM->instructions[ requestedInstruction ] == NULL) {
         error_handler.invalidInstruction();
     }
 
@@ -73,6 +61,5 @@ void executeInstruction(VirtualMachine* virtualM){
      *  - actualizar el CC si es necesario
      *  - actualizar el MAR MBR LAR si se accede a memoria
      */
-    virtualM->p_instructions[ requestedInstruction ]();
+    //virtualM->instructions[ requestedInstruction ]();
 }
-
