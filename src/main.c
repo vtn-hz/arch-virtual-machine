@@ -4,19 +4,31 @@
 #include <stdbool.h>
 #include "error_handler.h"
 #include "segment_table.h"
+#include "virtual_machine.h"
 
-void getArguments(int argc, char** argv);
-void getParsed(char *fileContent);
+void getArguments(int argc, char** argv,char *fileContent,int *sizeFile);
+void getParsed(char *fileContent,int *sizeFile);
 void readIdentifier(FILE *file,int* sizeFile);
 
-int main(int argc, char** argv){
-
+int main(int argc, char** argv) {
+    char *fileContent;
+    int sizeFile;
+    getArguments(argc, argv,fileContent,&sizeFile);
+    VirtualMachine* virtualM = createVm(sizeFile,fileContent);
+    //vmSetUp( virtual );
+    //addSegment(&virtual->segment_table, 0xA);
+    //addSegment(&virtual->segment_table, 200);
+    //printf("Memory left: %d\n", memorySizeLeft(virtual->segment_table));
+    //printf("Base CS: %d \n",virtual->segment_table.descriptors[0].base);
+    //printf("Base DS: %d \n",virtual->segment_table.descriptors[1].base);
+    //printf("Transform Logical Address 0x010A to Physical Address: %d \n", transformLogicalAddress(virtual->segment_table, 0x0001000A));
+    //printf(isLogicalAddressValid(virtual->segment_table, 0x0000000A) ? "Valid Address\n" : "Invalid Address\n");
+    releaseVm(virtualM);
     return 0;
 }
 
-void getArguments(int argc, char** argv)
+void getArguments(int argc, char** argv,char *fileContent,int *sizeFile)
 {
-    char *fileContent;
     char *ext;
     bool dissasembler=false;
     //check if file exists
@@ -30,7 +42,7 @@ void getArguments(int argc, char** argv)
     }    
     //check if file is .vmx
 
-    getParsed(fileContent);
+    getParsed(fileContent,sizeFile);
     //call getParsed
 
     if(argv[2]=="-d")
@@ -39,20 +51,19 @@ void getArguments(int argc, char** argv)
     //call segment table with fileContent
 }
 
-void getParsed(char *fileContent)
+void getParsed(char *fileContent,int *sizeFile)
 {
-    int sizeFile;
     FILE *file = fopen("sample.vmx", "rb");
     if(file==NULL){
         error_handler.fileNotFound();
     }
     // check if file exists
 
-    readIdentifier(file,&sizeFile);
+    readIdentifier(file,sizeFile);
 
     // save in memory the content of the file , malloc with the size of the file
-    fileContent = (char*) malloc(sizeFile * sizeof(char));
-    fread(fileContent,sizeof(char),sizeFile,file);
+    *fileContent = (char*) malloc(*sizeFile * sizeof(char));
+    fread(*fileContent,sizeof(char),*sizeFile,file); //shall we check if it read everything?
 
     fclose(file);
 }

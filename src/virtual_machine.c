@@ -1,23 +1,25 @@
 #include <stdlib.h>
-
 #include "virtual_machine.h"
+#include "segment_table.h"
+#include "error_handler.h"
 
-VirtualMachine* createVm ( int codeSegmentSize ) {
-    VirtualMachine* virtualM = (VirtualMachine*) malloc( sizeof(VirtualMachine) );
-    virtualM->mem = (char*) malloc( MEMORY_SIZE );
 
+VirtualMachine* createVm(int codeSegmentSize,char *fileContent){
+    VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
+    virtualM->memory = (char*) malloc(MEMORY_SIZE);
+
+    initSegmentTable(&virtualM->segment_table);
+    addSegment(&virtualM->segment_table, codeSegmentSize);
+    addSegment(&virtualM->segment_table, MEMORY_SIZE - codeSegmentSize);//we add the data segment here, we'll have to change it when we add more segments
 
     /**
      * some entity initialize segment table
      * virtual machine will use it to set 
      * CodeSegment & DataSegment
-     */
-    virtualM->table_seg[0].base = 0;
-    virtualM->table_seg[0].size = codeSegmentSize;
+    */
+    setMemoryContent(virtualM, fileContent, codeSegmentSize);
 
-    virtualM->table_seg[1].base = codeSegmentSize;
-    virtualM->table_seg[1].size = MEMORY_SIZE - codeSegmentSize;
-    // NO va aca esto, se deberia encargar la entidad ST
+    vmSetUp(virtualM, 0, 1); //assume code segment is 0 and data segment is 1 for now
 
     return virtualM;
 }
@@ -28,19 +30,29 @@ VirtualMachine* createVm ( int codeSegmentSize ) {
  * 
  * por el momento asume 0 y 1
  */
-void vmSetUp (VirtualMachine* virtualM) {
-    int *reg = virtualM->reg;
 
-    int cs = 0;
-    int ds = 1;
+void vmSetUp (VirtualMachine* virtualM, int csSegment, int dsSegment) {
+    int *reg = virtualM->registers;
 
-    reg[ CS ] = cs << 16; 
-    reg[ DS ] = ds << 16;
+    int cs = csSegment;
+    int ds = dsSegment;
 
-    reg[ IP ] = reg[ CS ];
+    reg[CS] = cs << 16; 
+    reg[DS] = ds << 16;
+
+    reg[IP] = reg[CS];
+}
+
+void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSize) {
+    if (contentSize > MEMORY_SIZE) {
+        error_handler.segmentationFault();
+    }
+    int address =transformLogicalAddress(virtualM->segment_table, virtualM->registers[CS]); //revise
+    for (int i = address; i < contentSize; i++)
+        virtualM->memory[i] = fileContent[i];
 }
 
 void releaseVm (VirtualMachine* virtualM) {
-    free(virtualM->mem);
+    free(virtualM->memory);
     free(virtualM);
 }
