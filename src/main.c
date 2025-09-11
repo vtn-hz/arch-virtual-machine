@@ -6,15 +6,17 @@
 #include "segment_table.h"
 #include "virtual_machine.h"
 
-void getArguments(int argc, char** argv,char *fileContent,int *sizeFile);
-void getParsed(char *fileContent,int *sizeFile);
-void readIdentifier(FILE *file,int* sizeFile);
+void getArguments(int argc, char** argv, char **fileContent, int *sizeFile, int *dissasembler);
+void getParsed(char **fileContent, int *sizeFile, char* path);
+void readIdentifier(FILE *file, int* sizeFile);
 
 int main(int argc, char** argv) {
     char *fileContent;
     int sizeFile;
-    getArguments(argc, argv,fileContent,&sizeFile);
+    int dissasembler=0;
+    getArguments(argc, argv, &fileContent,&sizeFile,&dissasembler);
     VirtualMachine* virtualM = createVm(sizeFile,fileContent);
+
     //vmSetUp( virtual );
     //addSegment(&virtual->segment_table, 0xA);
     //addSegment(&virtual->segment_table, 200);
@@ -27,10 +29,9 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-void getArguments(int argc, char** argv,char *fileContent,int *sizeFile)
+void getArguments(int argc, char** argv,char **fileContent,int *sizeFile,int *dissasembler)
 {
     char *ext;
-    bool dissasembler=false;
     //check if file exists
     if(argc<2){ //make new error: arguments missing
         error_handler.fileNotFound();
@@ -42,18 +43,19 @@ void getArguments(int argc, char** argv,char *fileContent,int *sizeFile)
     }    
     //check if file is .vmx
 
-    getParsed(fileContent,sizeFile);
+    char* path = argv[1];
+    printf("Path: %s\n",path); //debug
+    getParsed(fileContent,sizeFile,path);
     //call getParsed
 
-    if(argv[2]=="-d")
-        dissasembler=true;
+    *dissasembler = (strcmp(argv[2], "-d")==0);
 
     //call segment table with fileContent
 }
 
-void getParsed(char *fileContent,int *sizeFile)
-{
-    FILE *file = fopen("sample.vmx", "rb");
+void getParsed(char **fileContent, int *sizeFile, char* path)
+{    
+    FILE *file = fopen(path, "rb");
     if(file==NULL){
         error_handler.fileNotFound();
     }
@@ -62,9 +64,13 @@ void getParsed(char *fileContent,int *sizeFile)
     readIdentifier(file,sizeFile);
 
     // save in memory the content of the file , malloc with the size of the file
-    *fileContent = (char*) malloc(*sizeFile * sizeof(char));
-    fread(*fileContent,sizeof(char),*sizeFile,file); //shall we check if it read everything?
-
+    *fileContent = (char*) malloc(*sizeFile);
+    
+    fread(*fileContent,sizeof(char),*sizeFile,file); 
+    //for(int i=0;i<*sizeFile;i++)
+    //{
+    //    printf("%02X ",(unsigned char)(*fileContent)[i]); //debug
+    //}
     fclose(file);
 }
 
@@ -73,11 +79,11 @@ void readIdentifier(FILE *file,int* sizeFile) //asume que existe archivo
     char title[8];
      //revise formats
     fread(title,sizeof(char),8,file); //works and read what it has to
-    printf("%s",title); 
+    printf("%s\n",title); 
 
     (*sizeFile) = ((unsigned char)title[6] <<8) | (unsigned char)title[7]; //save the size
     //printf("%d",sizeFile);
-    if( !strncmp(title,"VMX25",5))
+    if(strncmp(title,"VMX25",5))
     {
         error_handler.invalidHeader();
     }
