@@ -20,7 +20,7 @@ int getData(VirtualMachine *virtualM, int operand, int bytes) {
 }
 
 int getDataFromRegister(VirtualMachine *virtualM, int operand, int bytes) {
-    return virtualM->reg[ extractOperationValue(operand) ];
+    return virtualM->registers[ extractOperationValue(operand) ];
 }
 
 int getDataFromInmediato (VirtualMachine *virtualM, int operand, int bytes) {
@@ -32,7 +32,7 @@ int getDataFromMemory (VirtualMachine *virtualM, int operand, int bytes) {
     int baseRegister = extractOperationBaseRegister( operand );
     int memoryOffset = extractOperationValue( operand );
 
-    int logicMemoryAccess = virtualM->reg[ baseRegister ] + memoryOffset;
+    int logicMemoryAccess = virtualM->registers[ baseRegister ] + memoryOffset;
     int fisicMemoryAccess = 20 + memoryOffset; /*transformAddress(virtualM->table_seg, logicMemoryAccess );*/ // doesnt existst yet
 
     // call memoryUpdateHandler( EVENT::GET, ...REQUIRED PARAMS)
@@ -42,7 +42,7 @@ int getDataFromMemory (VirtualMachine *virtualM, int operand, int bytes) {
         /**
          * CUIDADO!!! AL NO UTILIZAR transformAddress, TE ESTAS SALTANDO EL CONTROL DE SEGMENTOS 
          * */ 
-        readedData = (readedData << 8) | virtualM->mem[ fisicMemoryAccess +  i ];        
+        readedData = (readedData << 8) | virtualM->memory[ fisicMemoryAccess +  i ];        
     }
 
     return spreadSign( readedData, 32-bytes*8 );

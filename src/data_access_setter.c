@@ -10,7 +10,7 @@
 
 static p_setter_data availableDataSetter[4];
 
-void setData(VirtualMachine* virtualM, int operand, int value, int bytes) {
+void setData(VirtualMachine *virtualM, int operand, int value, int bytes) {
     int operandType = extractOperationType( operand );
 
     if (!(0 <= operandType && operandType <= 3)) {
@@ -22,18 +22,18 @@ void setData(VirtualMachine* virtualM, int operand, int value, int bytes) {
 
 
 void setDataToRegister(VirtualMachine *virtualM, int operand, int value, int bytes) {
-    virtualM->reg[ extractOperationValue(operand) ] = value;
+    virtualM->registers[ extractOperationValue(operand) ] = value;
 }
 
 void setDataToInmediato (VirtualMachine *virtualM, int operand, int value, int bytes) {
     error_handler.invalidInstruction();
 }
 
-void setDataToMemory(VirtualMachine* virtualM, int operand, int value, int bytes) {
+void setDataToMemory(VirtualMachine *virtualM, int operand, int value, int bytes) {
     int baseRegister = extractOperationBaseRegister( operand );
     int memoryOffset = extractOperationValue( operand );
 
-    int logicMemoryAccess = virtualM->reg[ baseRegister ] + memoryOffset;
+    int logicMemoryAccess = virtualM->registers[ baseRegister ] + memoryOffset;
     int fisicMemoryAccess = 20 + memoryOffset; /*transformAddress(virtualM->table_seg, logicMemoryAccess );*/ // doesnt existst yet
 
     /**
@@ -55,7 +55,7 @@ void setDataToMemory(VirtualMachine* virtualM, int operand, int value, int bytes
         /**
          * CUIDADO!!! AL NO UTILIZAR transformAddress, TE ESTAS SALTANDO EL CONTROL DE SEGMENTOS
          */
-        virtualM->mem[ fisicMemoryAccess + i ] = value & 0xFF ;
+        virtualM->memory[ fisicMemoryAccess + i ] = value & 0xFF ;
         value = value >> 8;        
     }
 
