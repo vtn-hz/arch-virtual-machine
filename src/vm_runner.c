@@ -16,7 +16,8 @@ void virtualMachineRun(VirtualMachine* virtualM) {
     while (!isSegmentCodeEnded(virtualM)) {
         prepareInstruction(virtualM);
         advanceInstructionPointer(virtualM);
-        executeInstruction(virtualM);
+        // printf("mnm:%08X op1:%08X op2:%08X ip:%08X\n", virtualM->registers[OPC], virtualM->registers[OP1], virtualM->registers[OP2], virtualM->registers[IP]);
+        // executeInstruction(virtualM);
     }
 }
 
@@ -27,48 +28,37 @@ void virtualMachineRun(VirtualMachine* virtualM) {
  * esta manera podria ser un ejemplo
  */
 int isSegmentCodeEnded(VirtualMachine* virtualM) {
-    return isLogicalAddressValid(virtualM->segment_table, virtualM->registers[IP]); // wrong: should return 0 if valid
+    return isLogicalAddressValid(virtualM->segment_table, virtualM->registers[IP]) == 0;
 }
 
 void prepareInstruction(VirtualMachine* virtualM) {
-    enum CommonRegisters mnm = OPC;
-    enum CommonRegisters op1 = OP1;
-    enum CommonRegisters op2 = OP2;
-    enum CommonRegisters ip = IP; // avoidable?
-
-    int index = transformLogicalAddress(virtualM->segment_table, virtualM->registers[ip]);
+    int index = transformLogicalAddress(virtualM->segment_table, virtualM->registers[IP]);
     unsigned char byte = virtualM->memory[index];
     
-    virtualM->registers[mnm] = byte & 0x1F; // 00011111
+    virtualM->registers[OPC] = byte & 0x1F; // 00011111
     
     byte >>= 4;
     if (byte & 0x01) { // >1 operand
-        virtualM->registers[op1] = (byte & 0x03) << 24;
-        virtualM->registers[op2] = (byte >> 2 & 0x03) << 24;
+        virtualM->registers[OP1] = (byte & 0x03) << 24;
+        virtualM->registers[OP2] = (byte >> 2 & 0x03) << 24;
     } else {
-        virtualM->registers[op1] = (byte >> 2 & 0x03) << 24;
-        virtualM->registers[op2] = 0; // if initialized, this is unnecessary
+        virtualM->registers[OP1] = (byte >> 2 & 0x03) << 24;
+        virtualM->registers[OP2] = 0; // if initialized, this is unnecessary
     }
-
-    // printf("f1 - mnm:%08X tp1:%08X tp2:%08X\n", virtualM->registers[mnm], virtualM->registers[op1], virtualM->registers[op2]);
 }
 
-void advanceInstructionPointer(VirtualMachine* virtualM) {
-    enum CommonRegisters op1 = OP1;
-    enum CommonRegisters op2 = OP2;
-    enum CommonRegisters ip = IP;
-    
-    int index = transformLogicalAddress(virtualM->segment_table, virtualM->registers[ip]);
+void advanceInstructionPointer(VirtualMachine* virtualM) {    
+    int index = transformLogicalAddress(virtualM->segment_table, virtualM->registers[IP]);
     index++; // skips already read instruction
     
-    int oparr[2] = {op1, op2};
+    int oparr[2] = {OP1, OP2};
     
     char tp1, tp2;
-    tp1 = virtualM->registers[op1] >> 24 & 0xFF; // 0xFF or 0x03?
-    tp2 = virtualM->registers[op2] >> 24 & 0xFF;
+    tp1 = virtualM->registers[OP1] >> 24 & 0xFF; // 0xFF or 0x03?
+    tp2 = virtualM->registers[OP2] >> 24 & 0xFF;
     char optarr[2] = {tp1, tp2};
     
-    virtualM->registers[ip] += 1 + tp1 + tp2; // moves ip
+    virtualM->registers[IP] += 1 + tp1 + tp2; // moves ip
 
     int n = (tp1 > 0) + (tp2 > 0); // number of arguments
     for (int i = n; i > 0; i--) {
@@ -88,8 +78,6 @@ void advanceInstructionPointer(VirtualMachine* virtualM) {
         
         virtualM->registers[oparr[i-1]] |= opaux; // fills operands
     }
-
-    // printf("f2 - op1:%08X op2:%08X ip:%08X\n", virtualM->registers[op1], virtualM->registers[op2], virtualM->registers[ip]);
 }
 
 void executeInstruction(VirtualMachine* virtualM){
