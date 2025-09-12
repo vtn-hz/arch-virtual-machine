@@ -25,8 +25,11 @@ void virtualMachineRun(VirtualMachine* virtualM) {
  * utilizar mas sencillo 
  * esta manera podria ser un ejemplo
  */
-int isSegmentCodeEnded(VirtualMachine* virtualM) {    
-    return isLogicalAddressValid(virtualM->segment_table, virtualM->registers[IP]);
+int isSegmentCodeEnded(VirtualMachine* virtualM) {
+    return isLogicalAddressValid(
+        virtualM->segment_table, 
+        virtualM->registers[ IP ]
+    );
 }
 
 void prepareInstruction(VirtualMachine* virtualM) {
