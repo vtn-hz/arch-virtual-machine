@@ -1,50 +1,53 @@
 #include <stdlib.h>
-
+#include <stdio.h>
 #include "virtual_machine.h"
-#include "data_access.h"
-
-VirtualMachine* createVm ( int codeSegmentSize ) {
-    VirtualMachine* virtualM = (VirtualMachine*) malloc( sizeof(VirtualMachine) );
-    virtualM->mem = (unsigned char*) malloc( MEMORY_SIZE );
+#include "segment_table.h"
+#include "error_handler.h"
 
 
+VirtualMachine* createVm(int codeSegmentSize,char *fileContent){
+    VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
+    virtualM->memory = (unsigned char*) malloc(MEMORY_SIZE);
+
+    initSegmentTable(&virtualM->segment_table);
+    printf("after init segment table\n"); //debug
+    addSegment(&virtualM->segment_table, codeSegmentSize);
+    addSegment(&virtualM->segment_table, memorySizeLeft(virtualM->segment_table));//we add the data segment here, we'll have to change it when we add more segments
     /**
      * some entity initialize segment table
      * virtual machine will use it to set 
      * CodeSegment & DataSegment
-     */
-    virtualM->table_seg[0].base = 0;
-    virtualM->table_seg[0].size = codeSegmentSize;
-
-    virtualM->table_seg[1].base = codeSegmentSize;
-    virtualM->table_seg[1].size = MEMORY_SIZE - codeSegmentSize;
-    // NO va aca esto, se deberia encargar la entidad ST
-
+    */
+    printf("before set memory content\n"); //debug
+    setMemoryContent(virtualM, fileContent, codeSegmentSize);
     return virtualM;
 }
 
-/**
- * faltan 2 inyecciones de parametros para determinar 
- * a que segmentos pertenecen CS y DS
- * 
- * por el momento asume 0 y 1
- */
-void vmSetUp (VirtualMachine* virtualM) {
+void vmSetUp (VirtualMachine* virtualM, int csSegment, int dsSegment) {
+    int *registers = virtualM->registers;
+
+    registers[CS] = csSegment << 16; 
+    registers[DS] = dsSegment << 16;
+
+    registers[IP] = registers[CS];
+
     initializeGetters();
     initializeSetters();
+}
 
-    int *reg = virtualM->reg;
-
-    int cs = 0;
-    int ds = 1;
-
-    reg[ CS ] = cs << 16; 
-    reg[ DS ] = ds << 16;
-
-    reg[ IP ] = reg[ CS ];
+void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSize) {
+    if (contentSize > MEMORY_SIZE) {
+        error_handler.segmentationFault();
+    }
+    int address =transformLogicalAddress(virtualM->segment_table, virtualM->registers[CS]); //revise
+    printf("Code Segment Base: %d\n", address); //debug
+    for (int i = address; i < contentSize; i++)
+        virtualM->memory[i] = fileContent[i];
+    for (int i=address; i<contentSize; i++)
+        printf("%02X ", (unsigned char)virtualM->memory[i]); //debug
 }
 
 void releaseVm (VirtualMachine* virtualM) {
-    free(virtualM->mem);
+    free(virtualM->memory);
     free(virtualM);
 }

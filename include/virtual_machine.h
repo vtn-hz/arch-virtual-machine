@@ -23,12 +23,14 @@ typedef struct VirtualMachine {
  * 
  * @return VirtualMachine*
  */
-VirtualMachine* createVm (int codeSegmentSize );
+VirtualMachine* createVm (int codeSegmentSize, char *fileContent);
 
 /**
  * inicializa los registros CS, DS, IP
  */
-void vmSetUp (VirtualMachine*);
+void vmSetUp (VirtualMachine*, int csSegment, int dsSegment);
+
+void setMemoryContent(VirtualMachine*, char*, int);
 
 void releaseVm(VirtualMachine*);
 
