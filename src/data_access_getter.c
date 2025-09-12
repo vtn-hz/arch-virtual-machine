@@ -12,12 +12,14 @@ static p_getter_data availableDataGetter[4];
 
 int getData(VirtualMachine *virtualM, int operand, int bytes) {
     int operandType = extractOperationType( operand );
+
     if (!(0 <= operandType && operandType <= 3)) {
         error_handler.invalidInstruction();   
     }
     
     return availableDataGetter[ operandType ](virtualM, operand, bytes);
 }
+
 
 int getDataFromRegister(VirtualMachine *virtualM, int operand, int bytes) {
     return virtualM->registers[ extractOperationValue(operand) ];
@@ -29,19 +31,22 @@ int getDataFromInmediato (VirtualMachine *virtualM, int operand, int bytes) {
 
 // ya deberiamos comenzar a utilizar el tipo int32_t
 int getDataFromMemory (VirtualMachine *virtualM, int operand, int bytes) {
+    DST segment_table = virtualM->segment_table; 
+    
     int baseRegister = extractOperationBaseRegister( operand );
     int memoryOffset = extractOperationValue( operand );
 
     int logicMemoryAccess = virtualM->registers[ baseRegister ] + memoryOffset;
-    int fisicMemoryAccess = 20 + memoryOffset; /*transformAddress(virtualM->table_seg, logicMemoryAccess );*/ // doesnt existst yet
+    int fisicMemoryAccess = transformLogicalAddress(segment_table, logicMemoryAccess);
+
+    if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 
+        error_handler.segmentationFault();
+    
 
     // call memoryUpdateHandler( EVENT::GET, ...REQUIRED PARAMS)
 
     int readedData = 0 ;
     for  (int i=0 ; i<bytes ; i++) {
-        /**
-         * CUIDADO!!! AL NO UTILIZAR transformAddress, TE ESTAS SALTANDO EL CONTROL DE SEGMENTOS 
-         * */ 
         readedData = (readedData << 8) | virtualM->memory[ fisicMemoryAccess +  i ];        
     }
 

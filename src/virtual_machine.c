@@ -1,7 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "virtual_machine.h"
+
 #include "segment_table.h"
+
+#include "data_access.h"
+
 #include "error_handler.h"
 
 
