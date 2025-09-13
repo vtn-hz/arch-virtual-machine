@@ -10,7 +10,7 @@
 #define MEMORY_SIZE 16384 
 
 typedef struct VirtualMachine {
-    char* memory;
+    unsigned char *memory;
     int registers[32];
     DST segment_table;
 

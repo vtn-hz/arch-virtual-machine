@@ -1,13 +1,18 @@
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "virtual_machine.h"
+
 #include "segment_table.h"
+
+#include "data_access.h"
+
 #include "error_handler.h"
 
 
 VirtualMachine* createVm(int codeSegmentSize,char *fileContent){
     VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
-    virtualM->memory = (char*) malloc(MEMORY_SIZE);
+    virtualM->memory = (unsigned char*) malloc(MEMORY_SIZE);
 
     initSegmentTable(&virtualM->segment_table);
     printf("after init segment table\n"); //debug
@@ -30,6 +35,9 @@ void vmSetUp (VirtualMachine* virtualM, int csSegment, int dsSegment) {
     registers[DS] = dsSegment << 16;
 
     registers[IP] = registers[CS];
+
+    initializeGetters();
+    initializeSetters();
 }
 
 void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSize) {
