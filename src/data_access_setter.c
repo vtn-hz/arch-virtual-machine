@@ -8,6 +8,8 @@
 
 #include "error_handler.h"
 
+#include "vm_state_handler.h"
+
 static p_setter_data availableDataSetter[4];
 
 void setData(VirtualMachine *virtualM, int operand, int value, int bytes) {
@@ -41,13 +43,15 @@ void setDataToMemory(VirtualMachine *virtualM, int operand, int value, int bytes
     if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 
         error_handler.segmentationFault();
     
-    // call memoryUpdateHandler( EVENT::SET, ...REQUIRED PARAMS)
+    prepareMemoryAccessHandler( virtualM, logicMemoryAccess, fisicMemoryAccess, bytes);
 
+    int buffer = value;
     for  (int i = bytes-1 ; i >= 0 ; i--) {
-        virtualM->memory[ fisicMemoryAccess + i ] = value & 0xFF ;
-        value = value >> 8;        
+        virtualM->memory[ fisicMemoryAccess + i ] = buffer & 0xFF ;
+        buffer = buffer >> 8;        
     }
 
+    commitMemoryAccessHandler( virtualM, value );
 }
 
 void setDataToEmpty (VirtualMachine *virtualM, int operand, int value, int bytes) {

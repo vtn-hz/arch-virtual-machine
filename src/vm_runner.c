@@ -2,8 +2,9 @@
 #include "vm_runner.h"
 #include "error_handler.h"
 #include "virtual_machine.h"
+#include "common_registers.h"
 #include "segment_table.h"
-
+// #include <stdio.h>
 
 int isSegmentCodeEnded(VirtualMachine*);
 
@@ -15,7 +16,8 @@ void virtualMachineRun(VirtualMachine* virtualM) {
     while (!isSegmentCodeEnded(virtualM)) {
         prepareInstruction(virtualM);
         advanceInstructionPointer(virtualM);
-        executeInstruction(virtualM);
+        // printf("mnm:%08X op1:%08X op2:%08X ip:%08X\n", virtualM->registers[OPC], virtualM->registers[OP1], virtualM->registers[OP2], virtualM->registers[IP]);
+        // executeInstruction(virtualM);
     }
 }
 
@@ -26,24 +28,57 @@ void virtualMachineRun(VirtualMachine* virtualM) {
  * esta manera podria ser un ejemplo
  */
 int isSegmentCodeEnded(VirtualMachine* virtualM) {
-    return isLogicalAddressValid(
+    return !isLogicalAddressValid(
         virtualM->segment_table, 
         virtualM->registers[ IP ]
     );
 }
 
 void prepareInstruction(VirtualMachine* virtualM) {
-    /**
-     * aca 99% se van a utilizar las funcionalidades
-     * de simon
-     */
+    int index = transformLogicalAddress(virtualM->segment_table, virtualM->registers[IP]);
+    unsigned char byte = virtualM->memory[index++];
+    
+    virtualM->registers[OPC] = byte & 0x1F; // 0001 1111
+    
+    char optarr[2] = {0};
+    int n, oparr[2] = {OP1, OP2};
+
+    byte >>= 4;
+    if (byte & 0x01) {
+        optarr[0] = byte & 0x03;
+        optarr[1] = byte >> 2 & 0x03;
+        n = 2;
+    } else {
+        optarr[0] = byte >> 2 & 0x03;
+        // optarr[1] = 0;
+        n = optarr[0];
+    }
+
+    virtualM->registers[OP1] = virtualM->registers[OP2] = 0;
+    for (int i = n; i > 0; i--) {
+        int opaux = 0;
+        
+        for (int j = 0; j < optarr[i-1]; j++) {
+            opaux <<= 8;
+            byte = virtualM->memory[index++];
+            opaux |= byte;
+        }
+        
+        if (optarr[i-1] == 2) { // if immediate, preserve sign
+            opaux = (opaux << 16) >> 16; // opaux = spreadSign(opaux, 16);
+            opaux &= 0x00FFFFFF;
+        }
+
+        
+        virtualM->registers[oparr[i-1]] = (optarr[i-1] << 24) | opaux; // fills operands (type + value)
+    }
 }
 
-void advanceInstructionPointer(VirtualMachine* virtualM) {
-    /**
-     *  segun el tamaño de la instrucción se avanza la
-     *  correspondiente cantidad de offsets al registro IP 
-     */
+void advanceInstructionPointer(VirtualMachine* virtualM) {    
+    char tp1 = virtualM->registers[OP1] >> 24 & 0xFF;
+    char tp2 = virtualM->registers[OP2] >> 24 & 0xFF;
+
+    virtualM->registers[IP] += 1 + tp1 + tp2;
 }
 
 void executeInstruction(VirtualMachine* virtualM){
