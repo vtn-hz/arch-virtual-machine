@@ -37,12 +37,12 @@
         char *ext;
         //check if file exists
         if(argc<2){ //make new error: arguments missing
-            error_handler.fileNotFound();
+            error_handler.fileNotFound( NO_ERROR_CONTEXT );
         }
         
         ext = strrchr(argv[1],'.'); //medio chancho pero funciona
         if(!ext || strcmp(ext,".vmx")!=0){
-            error_handler.invalidInstruction(); //should be invalid file type
+            error_handler.customError("Error: el archivo deberia ser .vmx"); //should be invalid file type
         }    
         //check if file is .vmx
 
@@ -59,7 +59,7 @@
     {    
         FILE *file = fopen(path, "rb");
         if(file==NULL){
-            error_handler.fileNotFound();
+            error_handler.fileNotFound( NO_ERROR_CONTEXT );
         }
         // check if file exists
 
@@ -86,7 +86,7 @@
         //printf("%d",sizeFile);
         if(strncmp(title,"VMX25",5))
         {
-            error_handler.invalidHeader();
+            error_handler.invalidHeader( NO_ERROR_CONTEXT );
         }
     }
 
