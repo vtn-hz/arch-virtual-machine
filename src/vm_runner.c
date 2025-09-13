@@ -85,11 +85,11 @@ void executeInstruction(VirtualMachine* virtualM){
     int requestedInstruction = virtualM->registers[OPC];
     
     if (!(0 <= requestedInstruction && requestedInstruction <= 31)) {
-        error_handler.invalidInstruction();
+        error_handler.invalidInstruction("código de instrucción inválido: %d", requestedInstruction);
     }
 
     if (virtualM->instructions[ requestedInstruction ] == NULL) {
-        error_handler.invalidInstruction();
+        error_handler.invalidInstruction("la instrucción %d no está implementada", requestedInstruction);
     }
 
     /**

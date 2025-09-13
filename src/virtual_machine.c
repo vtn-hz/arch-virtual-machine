@@ -42,7 +42,7 @@ void vmSetUp (VirtualMachine* virtualM, int csSegment, int dsSegment) {
 
 void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSize) {
     if (contentSize > MEMORY_SIZE) {
-        error_handler.segmentationFault();
+        error_handler.segmentationFault("el contenido del archivo es mayor a la memoria disponible");
     }
     int address =transformLogicalAddress(virtualM->segment_table, virtualM->registers[CS]); //revise
     printf("Code Segment Base: %d\n", address); //debug
