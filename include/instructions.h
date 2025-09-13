@@ -6,3 +6,5 @@ typedef struct VirtualMachine VirtualMachine;
 typedef void(*p_instruction)(VirtualMachine*);
 
 #endif
+
+void instructor();

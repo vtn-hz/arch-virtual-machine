@@ -5,6 +5,7 @@
     #include "error_handler.h"
     #include "segment_table.h"
     #include "virtual_machine.h"
+    #include "vm_runner.h"
 
     void getArguments(int argc, char** argv, char **fileContent, int *sizeFile, int *dissasembler);
     void getParsed(char **fileContent, int *sizeFile, char* path);
@@ -18,6 +19,7 @@
         
         VirtualMachine* virtualM = createVm(sizeFile,fileContent);
         vmSetUp(virtualM, 0, 1); //assume code segment is 0 and data segment is 1 for now
+        virtualMachineRun(virtualM);
         //vmSetUp( virtual );
         //addSegment(&virtual->segment_table, 0xA);
         //addSegment(&virtual->segment_table, 200);
