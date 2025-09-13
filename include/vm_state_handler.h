@@ -13,4 +13,6 @@ void commitMemoryAccessHandler (
     VirtualMachine* virtualM, int data
 );
 
+void updateCCRegisterHandler(VirtualMachine* virtualM, int result);
+
 #endif

@@ -20,3 +20,13 @@ void commitMemoryAccessHandler (
 ) {
     virtualM->registers[MBR] = data;
 }
+
+void updateCCRegisterHandler(VirtualMachine* virtualM, int result) {
+    virtualM->registers[CC] = 0;
+
+    if (result < 0) 
+        virtualM->registers[CC] |= (1 << 31);
+
+    if (result == 0) 
+        virtualM->registers[CC] |= (1 << 30);
+}
