@@ -16,7 +16,7 @@ void setData(VirtualMachine *virtualM, int operand, int value, int bytes) {
     int operandType = extractOperationType( operand );
 
     if (!(0 <= operandType && operandType <= 3)) {
-        error_handler.invalidInstruction("instrucción inválida: tipo de operando %d", operandType);   
+        error_handler.invalidInstruction("tipo de operando solicitado %d", operandType);   
     }
     
     availableDataSetter[ operandType ](virtualM, operand, value, bytes);
