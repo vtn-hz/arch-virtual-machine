@@ -8,6 +8,8 @@
 
 #include "error_handler.h"
 
+#include "vm_state_handler.h"
+
 static p_getter_data availableDataGetter[4];
 
 int getData(VirtualMachine *virtualM, int operand, int bytes) {
@@ -42,15 +44,16 @@ int getDataFromMemory (VirtualMachine *virtualM, int operand, int bytes) {
     if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 
         error_handler.segmentationFault();
     
-
-    // call memoryUpdateHandler( EVENT::GET, ...REQUIRED PARAMS)
+    prepareMemoryAccessHandler(virtualM, logicMemoryAccess, fisicMemoryAccess, bytes);
 
     int readedData = 0 ;
     for  (int i=0 ; i<bytes ; i++) {
         readedData = (readedData << 8) | virtualM->memory[ fisicMemoryAccess +  i ];        
     }
+    readedData = spreadSign( readedData, 32-bytes*8 );
+    commitMemoryAccessHandler( virtualM, readedData );
 
-    return spreadSign( readedData, 32-bytes*8 );
+    return readedData;
 }
 
 int getDataFromEmpty (VirtualMachine *virtualM, int operand, int bytes) {
