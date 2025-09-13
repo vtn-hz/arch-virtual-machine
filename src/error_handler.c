@@ -24,9 +24,11 @@ void fileNotFound(const char* context, ...) {
     va_list args;
     va_start(args, context);
 
-    customError(addErrorContext(buffer, message, context), args);
-    
+    vfprintf(stderr, addErrorContext(buffer, message, context), args);
+    fprintf(stderr, "\n");
+
     va_end(args);
+    exit(EXIT_FAILURE);
 }
 
 void invalidHeader(const char* context, ...) { 
@@ -36,9 +38,11 @@ void invalidHeader(const char* context, ...) {
     va_list args;
     va_start(args, context);
 
-    customError(addErrorContext(buffer, message, context), args);
-    
+    vfprintf(stderr, addErrorContext(buffer, message, context), args);
+    fprintf(stderr, "\n");
+
     va_end(args);
+    exit(EXIT_FAILURE);
 }
 
 void invalidInstruction(const char* context, ...) { 
@@ -48,9 +52,11 @@ void invalidInstruction(const char* context, ...) {
     va_list args;
     va_start(args, context);
 
-    customError(addErrorContext(buffer, message, context), args);
-    
+    vfprintf(stderr, addErrorContext(buffer, message, context), args);
+    fprintf(stderr, "\n");
+
     va_end(args);
+    exit(EXIT_FAILURE);
 }
 
 void segmentationFault(const char* context, ...) { 
@@ -60,9 +66,11 @@ void segmentationFault(const char* context, ...) {
     va_list args;
     va_start(args, context);
 
-    customError(addErrorContext(buffer, message, context), args);
-    
+    vfprintf(stderr, addErrorContext(buffer, message, context), args);
+    fprintf(stderr, "\n");
+
     va_end(args);
+    exit(EXIT_FAILURE);
 }
 
 void divisionByZero(const char* context, ...) { 
@@ -72,9 +80,11 @@ void divisionByZero(const char* context, ...) {
     va_list args;
     va_start(args, context);
 
-    customError(addErrorContext(buffer, message, context), args);
-    
+    vfprintf(stderr, addErrorContext(buffer, message, context), args);
+    fprintf(stderr, "\n");
+
     va_end(args);
+    exit(EXIT_FAILURE);
 }
 
 
