@@ -8,7 +8,7 @@
 
 
 static char* addErrorContext(char *buffer, const char *message, const char *context) {
-    if (context != NULL)
+    if (context != NO_ERROR_CONTEXT)
         sprintf(buffer, "%s\n%s", message, context);
     else 
         sprintf(buffer, "%s", message);
