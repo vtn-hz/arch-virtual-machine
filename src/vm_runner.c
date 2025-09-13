@@ -33,37 +33,27 @@ int isSegmentCodeEnded(VirtualMachine* virtualM) {
 
 void prepareInstruction(VirtualMachine* virtualM) {
     int index = transformLogicalAddress(virtualM->segment_table, virtualM->registers[IP]);
-    unsigned char byte = virtualM->memory[index];
+    unsigned char byte = virtualM->memory[index++];
     
-    virtualM->registers[OPC] = byte & 0x1F; // 00011111
+    virtualM->registers[OPC] = byte & 0x1F; // 0001 1111
     
+    char optarr[2] = {0};
+    int n, oparr[2] = {OP1, OP2};
+
     byte >>= 4;
-    if (byte & 0x01) { // >1 operand
-        virtualM->registers[OP1] = (byte & 0x03) << 24;
-        virtualM->registers[OP2] = (byte >> 2 & 0x03) << 24;
+    if (byte & 0x01) {
+        optarr[0] = byte & 0x03;
+        optarr[1] = byte >> 2 & 0x03;
+        n = 2;
     } else {
-        virtualM->registers[OP1] = (byte >> 2 & 0x03) << 24;
-        virtualM->registers[OP2] = 0; // if initialized, this is unnecessary
+        optarr[0] = byte >> 2 & 0x03;
+        // optarr[1] = 0;
+        n = optarr[0];
     }
-}
 
-void advanceInstructionPointer(VirtualMachine* virtualM) {    
-    int index = transformLogicalAddress(virtualM->segment_table, virtualM->registers[IP]);
-    index++; // skips already read instruction
-    
-    int oparr[2] = {OP1, OP2};
-    
-    char tp1, tp2;
-    tp1 = virtualM->registers[OP1] >> 24 & 0xFF; // 0xFF or 0x03?
-    tp2 = virtualM->registers[OP2] >> 24 & 0xFF;
-    char optarr[2] = {tp1, tp2};
-    
-    virtualM->registers[IP] += 1 + tp1 + tp2; // moves ip
-
-    int n = (tp1 > 0) + (tp2 > 0); // number of arguments
+    virtualM->registers[OP1] = virtualM->registers[OP2] = 0;
     for (int i = n; i > 0; i--) {
-        unsigned char byte;
-        int opaux = 0; // ends up as 00 ?? ?? ?? (ej: 00 0D 00 04) for the final |=
+        int opaux = 0;
         
         for (int j = 0; j < optarr[i-1]; j++) {
             opaux <<= 8;
@@ -74,10 +64,18 @@ void advanceInstructionPointer(VirtualMachine* virtualM) {
         if (optarr[i-1] == 2) { // if immediate, preserve sign
             opaux = (opaux << 16) >> 16; // opaux = spreadSign(opaux, 16);
             opaux &= 0x00FFFFFF;
-        } 
+        }
+
         
-        virtualM->registers[oparr[i-1]] |= opaux; // fills operands
+        virtualM->registers[oparr[i-1]] = (optarr[i-1] << 24) | opaux; // fills operands (type + value)
     }
+}
+
+void advanceInstructionPointer(VirtualMachine* virtualM) {    
+    char tp1 = virtualM->registers[OP1] >> 24 & 0xFF;
+    char tp2 = virtualM->registers[OP2] >> 24 & 0xFF;
+
+    virtualM->registers[IP] += 1 + tp1 + tp2;
 }
 
 void executeInstruction(VirtualMachine* virtualM){
