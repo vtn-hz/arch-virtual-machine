@@ -1,37 +1,57 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "error_handler.h"
 
+
 void fileNotFound() {
-    fprintf(stderr, "%s", "No se encontró el archivo\n");
-    exit(EXIT_FAILURE);
+    buildError("Error: no se encontró el archivo");
 }
 
 void invalidHeader() {
-    fprintf(stderr, "%s", "Cabecera de archivo inválida\n");
-    exit(EXIT_FAILURE);
+    buildError("Error: cabecera de archivo inválida");
 } 
 
-void invalidInstruction() {
-    fprintf(stderr, "%s", "Instrucción inválida\n");
-    exit(EXIT_FAILURE);
+void invalidInstruction( int instruction ) { 
+    buildError("Error: {%d} instrucción inválida", instruction);
 }
 
-void segmentationFault() {
-    fprintf(stderr, "%s", "Error de segmentación\n");
-    exit(EXIT_FAILURE);
+void invalidOperand( int operador ) {
+    buildError("Error: {%d} operador inválido", operador);
 }
 
-void divisionByZero() {
-    fprintf(stderr, "%s", "Error de división por cero\n");
+void emptyOperand() {
+    buildError("Error: operador vacío");
+}
+
+void segmentationFault( int logical_address ) {
+    buildError("Error: {%x} falla de segmentación", logical_address);
+}
+
+void divisionByZero( int a, int b ) {
+    buildError("Error: {%d}/{%d} división por cero", a, b);
+}
+
+void buildError(const char* context, ...) {
+    va_list args;
+    va_start(args, context);
+    vfprintf(stderr, context, args);
+    fprintf(stderr, "\n");
+    va_end(args);
     exit(EXIT_FAILURE);
 }
 
 ErrorHandler error_handler = {
     fileNotFound, 
     invalidHeader, 
+
     invalidInstruction,
+    invalidOperand,
+    emptyOperand,
+    
     segmentationFault, 
-    divisionByZero
+    divisionByZero,
+
+    buildError
 };
