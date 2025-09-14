@@ -33,7 +33,7 @@ static int calcLogicToPhysical(DST table, int logicalAddress) {
 int transformLogicalAddress (DST table, int logicalAddress) {
     int physicalAddress = calcLogicToPhysical(table, logicalAddress);
     if(physicalAddress == -1) 
-        error_handler.segmentationFault();
+        error_handler.segmentationFault(logicalAddress);
     
     return physicalAddress;
 }
@@ -45,7 +45,7 @@ int isLogicalAddressValid (DST table, int logicalAddress) {
 void addSegment(DST* table, unsigned short size) {
     unsigned short base;
     if (table->counter == DST_MAX) 
-        error_handler.segmentationFault(); // no more space for new segments
+        error_handler.buildError("Error: segment table lleno"); // no more space for new segments
     
     if (table->counter > 0) {
         ST* lastSegment = &table->descriptors[table->counter - 1];
@@ -53,7 +53,7 @@ void addSegment(DST* table, unsigned short size) {
     }
 
     if (base + size > MEMORY_SIZE) 
-        error_handler.segmentationFault(); // not enough memory   
+        error_handler.buildError("Error: {base: %d, size: %d} memoria solicitada no disponible", base, size); // not enough memory   
 
     table->descriptors[table->counter].base = base;
     table->descriptors[table->counter].size = size;
