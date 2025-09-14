@@ -42,7 +42,7 @@
         
         ext = strrchr(argv[1],'.'); //medio chancho pero funciona
         if(!ext || strcmp(ext,".vmx")!=0){
-            error_handler.invalidInstruction(); //should be invalid file type
+            error_handler.buildError("Error: el tipo de archivo esperado es .vmx"); //should be invalid file type
         }    
         //check if file is .vmx
 
