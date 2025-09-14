@@ -16,7 +16,7 @@ void setData(VirtualMachine *virtualM, int operand, int value, int bytes) {
     int operandType = extractOperationType( operand );
 
     if (!(0 <= operandType && operandType <= 3)) {
-        error_handler.invalidInstruction();   
+        error_handler.invalidOperand(operand);   
     }
     
     availableDataSetter[ operandType ](virtualM, operand, value, bytes);
@@ -28,7 +28,7 @@ void setDataToRegister(VirtualMachine *virtualM, int operand, int value, int byt
 }
 
 void setDataToInmediato (VirtualMachine *virtualM, int operand, int value, int bytes) {
-    error_handler.invalidInstruction();
+    error_handler.buildError("Error: no se puede asignar a un inmediato");
 }
 
 void setDataToMemory(VirtualMachine *virtualM, int operand, int value, int bytes) {
@@ -41,7 +41,7 @@ void setDataToMemory(VirtualMachine *virtualM, int operand, int value, int bytes
     int fisicMemoryAccess = transformLogicalAddress(segment_table, logicMemoryAccess);
 
     if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 
-        error_handler.segmentationFault();
+        error_handler.segmentationFault(logicMemoryAccess);
     
     prepareMemoryAccessHandler( virtualM, logicMemoryAccess, fisicMemoryAccess, bytes);
 
@@ -55,7 +55,7 @@ void setDataToMemory(VirtualMachine *virtualM, int operand, int value, int bytes
 }
 
 void setDataToEmpty (VirtualMachine *virtualM, int operand, int value, int bytes) {
-    error_handler.invalidInstruction();
+    error_handler.emptyOperand();
 }
 
 void initializeSetters () {

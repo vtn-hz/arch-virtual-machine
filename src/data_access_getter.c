@@ -16,7 +16,7 @@ int getData(VirtualMachine *virtualM, int operand, int bytes) {
     int operandType = extractOperationType( operand );
 
     if (!(0 <= operandType && operandType <= 3)) {
-        error_handler.invalidInstruction();   
+        error_handler.invalidOperand(operand);   
     }
     
     return availableDataGetter[ operandType ](virtualM, operand, bytes);
@@ -42,7 +42,7 @@ int getDataFromMemory (VirtualMachine *virtualM, int operand, int bytes) {
     int fisicMemoryAccess = transformLogicalAddress(segment_table, logicMemoryAccess);
 
     if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 
-        error_handler.segmentationFault();
+        error_handler.segmentationFault(logicMemoryAccess);
     
     prepareMemoryAccessHandler(virtualM, logicMemoryAccess, fisicMemoryAccess, bytes);
 
@@ -57,7 +57,7 @@ int getDataFromMemory (VirtualMachine *virtualM, int operand, int bytes) {
 }
 
 int getDataFromEmpty (VirtualMachine *virtualM, int operand, int bytes) {
-    error_handler.invalidInstruction();
+    error_handler.emptyOperand();
     return 0;
 }
 
