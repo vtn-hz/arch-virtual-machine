@@ -5,4 +5,15 @@ typedef struct VirtualMachine VirtualMachine;
 
 typedef void(*p_instruction)(VirtualMachine*);
 
+void SHL (VirtualMachine*);
+void SHR (VirtualMachine*);
+void SAR (VirtualMachine*);  
+void AND (VirtualMachine*);
+void OR (VirtualMachine*);
+void XOR (VirtualMachine*);
+void SWAP (VirtualMachine*);
+void LDL (VirtualMachine*);
+void LDH (VirtualMachine*);
+void RND (VirtualMachine*);
+
 #endif
