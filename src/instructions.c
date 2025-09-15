@@ -113,3 +113,76 @@ void RND(VirtualMachine* vm) {
 
     setData(vm, vm->registers[OP1], randomValue, bytes);
 }
+
+void JMP(VirtualMachine* virtualM) {
+    int bytes = 4;
+    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+    
+    virtualM->registers[IP] = data;    
+}
+
+void JZ(VirtualMachine* virtualM) {
+    int bytes = 4;
+    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+
+    unsigned int cc = virtualM->registers[CC];
+    if (cc >> 30 == 1)
+        virtualM->registers[IP] = data;
+    else 
+        virtualM->registers[IP]++;
+}
+
+void JP(VirtualMachine* virtualM) {
+    int bytes = 4;
+    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+
+    unsigned int cc = virtualM->registers[CC];
+    if (cc >> 30 == 0) 
+        virtualM->registers[IP] = data;
+    else 
+        virtualM->registers[IP]++;
+}
+
+void JN(VirtualMachine* virtualM) {
+    int bytes = 4;
+    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+
+    unsigned int cc = virtualM->registers[CC];
+    if (cc >> 30 == 2)
+        virtualM->registers[IP] = data;
+    else 
+        virtualM->registers[IP]++;
+}
+
+void JNZ(VirtualMachine* virtualM) {
+    int bytes = 4;
+    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+
+    unsigned int cc = virtualM->registers[CC];
+    if (cc >> 30 == 0 || cc >> 30 == 2)
+        virtualM->registers[IP] = data;
+    else 
+        virtualM->registers[IP]++;
+}
+
+void JNP(VirtualMachine* virtualM) {
+    int bytes = 4;
+    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+
+    unsigned int cc = virtualM->registers[CC];
+    if (cc >> 30 == 1 || cc >> 30 == 2)
+        virtualM->registers[IP] = data;
+    else 
+        virtualM->registers[IP]++;
+}
+
+void JNN(VirtualMachine* virtualM) {
+    int bytes = 4;
+    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+
+    unsigned int cc = virtualM->registers[CC];
+    if (cc >> 30 == 0 || cc >> 30 == 1)
+        virtualM->registers[IP] = data;
+    else 
+        virtualM->registers[IP]++;
+}
