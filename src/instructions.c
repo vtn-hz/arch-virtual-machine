@@ -170,8 +170,9 @@ void RND(VirtualMachine* vm) {
 void SYS(VirtualMachine* virtualM){
     int bytes = 4;
     int pos = EDX<<16;
-    int quantity = applyMask(virtualM->registers[ECX], 0x00FF,0);
-    int size = applyMask(virtualM->registers[ECX], 0xFFFF0000,16);
+    int quantity =virtualM->registers[ECX] & 0xFFFF;
+    int size = (virtualM->registers[ECX] >> 16) & 0xFFFF;
+    //int size = (unsigned int)virtualM->registers[ECX] >> 16;
     int mode = virtualM->registers[EAX];
     int call = getData(virtualM, virtualM->registers[OP1], bytes);
     //printf("EDX %08X\n",pos);
@@ -237,11 +238,10 @@ void SYS(VirtualMachine* virtualM){
                 return;
         }
         
-        for(int i=0; i<quantity; i++) {
+        for(int i=-quantity; i<0; i++) { //preguntar, el original es i = 0; i<quantity
             value = getDataFromMemory(virtualM, pos+i*size, size);
             writer(value);
         }
-
     }
     else {
         error_handler.buildError("Error: operacion de sistema invalida");
