@@ -5,6 +5,8 @@
     #include "error_handler.h"
     #include "segment_table.h"
     #include "virtual_machine.h"
+
+    #include "vm_printer.h"
     #include "vm_runner.h"
 
     void getArguments(int argc, char** argv, char **fileContent, int *sizeFile, int *dissasembler);
@@ -19,6 +21,9 @@
         
         VirtualMachine* virtualM = createVm(sizeFile,fileContent);
         vmSetUp(virtualM, 0, 1); //assume code segment is 0 and data segment is 1 for now
+        if (dissasembler) 
+            virtualMachinePrint(virtualM);
+        
         virtualMachineRun(virtualM);
         //vmSetUp( virtual );
         //addSegment(&virtual->segment_table, 0xA);
@@ -31,6 +36,53 @@
         releaseVm(virtualM);
         return 0;
     }
+
+    // Función helper para imprimir resultados de tests
+    void printTestResult(const char* testName, int expected, int actual, int passed);
+
+    // Helper para configurar operandos
+    void setupOperands(VirtualMachine* vm, int op1_addr, int op1_value, int op2_value);
+
+    // Tests para cada instrucción
+    void testSHL(VirtualMachine* vm);
+    void testSHR(VirtualMachine* vm);
+    void testSAR(VirtualMachine* vm);
+    void testAND(VirtualMachine* vm);
+    void testOR(VirtualMachine* vm);
+    void testXOR(VirtualMachine* vm);
+    void testSWAP(VirtualMachine* vm);
+    void testLDL(VirtualMachine* vm);
+    void testLDH(VirtualMachine* vm);
+    void testRND(VirtualMachine* vm);
+
+
+    /*int main(int argc, char** argv) {
+        printf("=== VIRTUAL MACHINE INSTRUCTION TESTS ===\n");
+        
+        // Crear máquina virtual (simulando el setup que tienes)
+        char dummyContent[1000] = {0}; // Contenido dummy para la VM
+        VirtualMachine* vm = createVm(1000, dummyContent);
+        vmSetUp(vm, 0, 1); // code segment = 0, data segment = 1
+        
+        // Ejecutar todos los tests usando la misma VM
+        testSHL(vm);
+        testSHR(vm);
+        testSAR(vm);
+        testAND(vm);
+        testOR(vm);
+        testXOR(vm);
+        testSWAP(vm);
+        testLDL(vm);
+        testLDH(vm);
+        testRND(vm);
+        
+        printf("\n=== ALL TESTS COMPLETED ===\n");
+        
+        // Liberar recursos
+        releaseVm(vm);
+        
+        return 0;
+    }*/
 
     void getArguments(int argc, char** argv,char **fileContent,int *sizeFile,int *dissasembler)
     {
