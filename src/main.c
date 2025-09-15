@@ -11,6 +11,8 @@
 
     #include "instructions.h"
 
+    // #include "data_access.h"
+
     void getArguments(int argc, char** argv, char **fileContent, int *sizeFile, int *dissasembler);
     void getParsed(char **fileContent, int *sizeFile, char* path);
     void readIdentifier(FILE *file, int* sizeFile);
@@ -23,7 +25,31 @@
         VirtualMachine* virtualM = createVm(sizeFile,fileContent);
         if (dissasembler) 
             virtualMachinePrint(virtualM);
-        
+
+        // virtualM->registers[OP1] = 0x031B0003;
+        // virtualM->registers[OP2] = 0x02000000 + 'a';
+        // virtualM->registers[OPC] = 0x00000010;
+        // MOV(virtualM);
+        // virtualM->registers[OP1] = 0x031B0002;
+        // virtualM->registers[OP2] = 0x02000000 + 'l';
+        // virtualM->registers[OPC] = 0x00000010;
+        // MOV(virtualM);
+        // virtualM->registers[OP1] = 0x031B0001;
+        // virtualM->registers[OP2] = 0x02000000 + 'o';
+        // virtualM->registers[OPC] = 0x00000010;
+        // MOV(virtualM);
+        // virtualM->registers[OP1] = 0x031B0000;
+        // virtualM->registers[OP2] = 0x02000000 + 'H';
+        // virtualM->registers[OPC] = 0x00000010;
+        // MOV(virtualM);
+
+        // virtualM->registers[EDX] = virtualM->registers[DS] + 3;
+        // virtualM->registers[ECX] = 0x00010004;
+        // virtualM->registers[EAX] = 0x001F;
+        // virtualM->registers[OP1] = 0x02000002;
+
+        // SYS(virtualM);
+
         //virtualMachineRun(virtualM);
         //vmSetUp( virtual );
         //addSegment(&virtual->segment_table, 0xA);

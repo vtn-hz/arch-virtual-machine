@@ -1,6 +1,8 @@
 #ifndef READ_FUNCTIONS_H
 #define READ_FUNCTIONS_H
 
+typedef void (*writeFunc)(int);
+
 int readDecimal();
 int readChar();
 int readOctal();
@@ -12,5 +14,7 @@ void writeChar(int value);
 void writeOctal(int value);
 void writeHex(int value);
 void writeBinary(int value);
+
+void prepareDisplays(int, writeFunc*, int*);
 
 #endif // READ_FUNCTIONS_H

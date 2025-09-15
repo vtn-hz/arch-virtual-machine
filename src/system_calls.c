@@ -1,4 +1,6 @@
 #include "system_calls.h"
+#include "virtual_machine.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,24 +35,31 @@ int readBinary() {
 }
 
 void writeDecimal(int value) {
-    printf("%d\n", value);
+    printf("%d ", value);
 }
 
 void writeChar(int value) {
-    printf("%c\n", (char)value);
+    printf("%c ", (char)value);
 }
 
 void writeOctal(int value) {
-    printf("%o\n", value);
+    printf("%o ", value);
 }
 
 void writeHex(int value) {
-    printf("%X\n", value);
+    printf("%X ", value);
 }
 
 void writeBinary(int value) {
-    for (int i = sizeof(value) * 8 - 1; i >= 0; i--) {
+    for (int i = (sizeof(value) - 2) * 8 - 1; i >= 0; i--) {
         putchar((value & (1 << i)) ? '1' : '0');
     }
-    printf("\n");
+}
+
+void prepareDisplays(int mode, writeFunc funcs[], int *count) {
+    if (mode & 0b00001) funcs[(*count)++] = writeDecimal;
+    if (mode & 0b00010) funcs[(*count)++] = writeChar;
+    if (mode & 0b00100) funcs[(*count)++] = writeOctal;
+    if (mode & 0b01000) funcs[(*count)++] = writeHex;
+    if (mode & 0b10000) funcs[(*count)++] = writeBinary;
 }

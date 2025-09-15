@@ -17,7 +17,7 @@
 #include "vm_state_handler.h"
 
 void MOV(VirtualMachine* virtualM) {
-    int bytes = 1;
+    int bytes = 4;
     int data = getData(virtualM, virtualM->registers[OP2], bytes);
     setData(virtualM, virtualM->registers[OP1], data, bytes);
 }
@@ -65,7 +65,7 @@ void CMP(VirtualMachine* virtualM) {
     updateCCRegisterHandler(virtualM, data1 - data2);
 }
 
-void SHL (VirtualMachine* vm) {
+void SHL(VirtualMachine* vm) {
     int bytes = 4;
 
     int dataOp1 = getData(vm, vm->registers[OP1], bytes);
@@ -74,7 +74,7 @@ void SHL (VirtualMachine* vm) {
     setData(vm, vm->registers[OP1], dataOp1 << dataOp2, bytes);
 }
 
-void SHR (VirtualMachine* vm) {
+void SHR(VirtualMachine* vm) {
     int bytes = 4;
 
     int dataOp1 = getData(vm, vm->registers[OP1], bytes);
@@ -90,7 +90,7 @@ void SHR (VirtualMachine* vm) {
     setData(vm, vm->registers[OP1], signBit & sar, bytes);
 }
 
-void SAR (VirtualMachine* vm) {
+void SAR(VirtualMachine* vm) {
     int bytes = 4;
 
     int dataOp1 = getData(vm, vm->registers[OP1], bytes);
@@ -99,7 +99,7 @@ void SAR (VirtualMachine* vm) {
     setData(vm, vm->registers[OP1], dataOp1 >> dataOp2, bytes);
 }
 
-void AND (VirtualMachine* vm) {
+void AND(VirtualMachine* vm) {
     int bytes = 4;
 
     int dataOp1 = getData(vm, vm->registers[OP1], bytes);
@@ -108,7 +108,7 @@ void AND (VirtualMachine* vm) {
     setData(vm, vm->registers[OP1], dataOp1 & dataOp2, bytes);
 }
 
-void OR (VirtualMachine* vm) {
+void OR(VirtualMachine* vm) {
     int bytes = 4;
 
     int dataOp1 = getData(vm, vm->registers[OP1], bytes);
@@ -117,7 +117,7 @@ void OR (VirtualMachine* vm) {
     setData(vm, vm->registers[OP1], dataOp1 | dataOp2, bytes);
 }
 
-void XOR (VirtualMachine* vm) {
+void XOR(VirtualMachine* vm) {
     int bytes = 4;
 
     int dataOp1 = getData(vm, vm->registers[OP1], bytes);
@@ -126,7 +126,7 @@ void XOR (VirtualMachine* vm) {
     setData(vm, vm->registers[OP1], dataOp1 ^ dataOp2, bytes);
 }
 
-void SWAP (VirtualMachine* vm) {
+void SWAP(VirtualMachine* vm) {
     int bytes = 4;
 
     int dataOp1 = getData(vm, vm->registers[OP1], bytes);
@@ -239,6 +239,7 @@ void JNN(VirtualMachine* virtualM) {
     else 
         virtualM->registers[IP]++;
 }
+
 void SYS(VirtualMachine* virtualM){
     int bytes = 4;
     int pos = EDX<<16;
@@ -287,33 +288,21 @@ void SYS(VirtualMachine* virtualM){
     }
     else if(call==2) //write
     { 
-        void (*writer)(int) = NULL;
+        int count = 0;
+        writeFunc funcs[5];
+        prepareDisplays(mode, funcs, &count);
 
-        switch (mode) {
-            case 0x01: 
-                writer = writeDecimal; 
-                break;
-            case 0x02: 
-                writer = writeChar; 
-                break;
-            case 0x04: 
-                writer = writeOctal; 
-                break;
-            case 0x08: 
-                writer = writeHex; 
-                break;
-            case 0x10: 
-                writer = writeBinary; 
-                break;
-            default:
-                error_handler.buildError("Error: modo de escritura invalido");
-                return;
-        }
-        
-        for(int i=-quantity; i<0; i++) { //preguntar, el original es i = 0; i<quantity
+        for(int i=0; i<quantity; i++) { //preguntar, el original es i = 0; i<quantity
             value = getDataFromMemory(virtualM, pos+i*size, size);
-            writer(value);
+            
+            for (int j = 0; j < count; j++) {
+                if (j > 0) printf(" ");
+                funcs[j](value);
+            }
+
+            printf("\n");
         }
+
     }
     else {
         error_handler.buildError("Error: operacion de sistema invalida");
