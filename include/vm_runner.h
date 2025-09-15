@@ -9,4 +9,10 @@ typedef struct VirtualMachine VirtualMachine;
  */
 void virtualMachineRun( VirtualMachine* );
 
+int isSegmentCodeEnded(VirtualMachine*);
+
+void prepareInstruction( VirtualMachine* );
+
+void advanceInstructionPointer( VirtualMachine* );
+
 #endif
