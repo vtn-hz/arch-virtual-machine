@@ -8,9 +8,45 @@
 
 #include "utils.h"
 
+#include "vm_state_handler.h"
+
 #include <stdlib.h>
 #include <time.h>
 
+void initializeInstructions(VirtualMachine* vm) {
+    // vm->instructions[0x00] = SYS;
+    vm->instructions[0x01] = JMP;
+    vm->instructions[0x02] = JZ;
+    vm->instructions[0x03] = JP;
+    vm->instructions[0x04] = JN;
+    vm->instructions[0x05] = JNZ;
+    vm->instructions[0x06] = JNP;
+    vm->instructions[0x07] = JNN;
+    // vm->instructions[0x08] = NOT;
+    vm->instructions[0x09] = NULL;
+    vm->instructions[0x0A] = NULL;
+    vm->instructions[0x0B] = NULL;
+    vm->instructions[0x0C] = NULL;
+    vm->instructions[0x0D] = NULL;
+    vm->instructions[0x0E] = NULL;
+    // vm->instructions[0x0F] = STOP;
+    // vm->instructions[0x10] = MOV;
+    // vm->instructions[0x11] = ADD;
+    // vm->instructions[0x12] = SUB;
+    // vm->instructions[0x13] = MUL;
+    // vm->instructions[0x14] = DIV;
+    // vm->instructions[0x15] = CMP;
+    vm->instructions[0x16] = SHL;
+    vm->instructions[0x17] = SHR;
+    vm->instructions[0x18] = SAR;
+    vm->instructions[0x19] = AND;
+    vm->instructions[0x1A] = OR;
+    vm->instructions[0x1B] = XOR;
+    vm->instructions[0x1C] = SWAP;
+    vm->instructions[0x1D] = LDL;
+    vm->instructions[0x1E] = LDH;
+    vm->instructions[0x1F] = RND;
+}
 
 void SHL (VirtualMachine* vm) {
     int bytes = 4;
@@ -132,7 +168,7 @@ void JZ(VirtualMachine* virtualM) {
     int bytes = 4;
     int data = getData(virtualM, virtualM->registers[OP1], bytes);
 
-    unsigned int cc = virtualM->registers[CC];
+    unsigned int cc = virtualM->registers[CC]; 
     if (cc >> 30 == 1)
         virtualM->registers[IP] = data;
     else 

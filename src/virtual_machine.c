@@ -38,6 +38,7 @@ void vmSetUp (VirtualMachine* virtualM, int csSegment, int dsSegment) {
 
     initializeGetters();
     initializeSetters();
+    initializeInstructions(virtualM);
 }
 
 void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSize) {
