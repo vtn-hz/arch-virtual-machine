@@ -157,75 +157,75 @@ void RND(VirtualMachine* vm) {
     updateCCRegisterHandler(vm, randomValue);
 }
 
-void JMP(VirtualMachine* virtualM) {
+void JMP(VirtualMachine* vm) {
     int bytes = 4;
-    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1], bytes);
     
-    virtualM->registers[IP] = data;    
+    vm->registers[IP] = data;    
 }
 
-void JZ(VirtualMachine* virtualM) {
+void JZ(VirtualMachine* vm) {
     int bytes = 4;
-    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1], bytes);
 
-    unsigned int cc = virtualM->registers[CC]; 
+    unsigned int cc = vm->registers[CC]; 
     if (cc >> 30 == 1)
-        virtualM->registers[IP] = data;
+        vm->registers[IP] = data;
     else 
-        virtualM->registers[IP]++;
+        vm->registers[IP]++;
 }
 
-void JP(VirtualMachine* virtualM) {
+void JP(VirtualMachine* vm) {
     int bytes = 4;
-    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1], bytes);
 
-    unsigned int cc = virtualM->registers[CC];
+    unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0) 
-        virtualM->registers[IP] = data;
+        vm->registers[IP] = data;
     else 
-        virtualM->registers[IP]++;
+        vm->registers[IP]++;
 }
 
-void JN(VirtualMachine* virtualM) {
+void JN(VirtualMachine* vm) {
     int bytes = 4;
-    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1], bytes);
 
-    unsigned int cc = virtualM->registers[CC];
+    unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 2)
-        virtualM->registers[IP] = data;
+        vm->registers[IP] = data;
     else 
-        virtualM->registers[IP]++;
+        vm->registers[IP]++;
 }
 
-void JNZ(VirtualMachine* virtualM) {
+void JNZ(VirtualMachine* vm) {
     int bytes = 4;
-    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1], bytes);
 
-    unsigned int cc = virtualM->registers[CC];
+    unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0 || cc >> 30 == 2)
-        virtualM->registers[IP] = data;
+        vm->registers[IP] = data;
     else 
-        virtualM->registers[IP]++;
+        vm->registers[IP]++;
 }
 
-void JNP(VirtualMachine* virtualM) {
+void JNP(VirtualMachine* vm) {
     int bytes = 4;
-    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1], bytes);
 
-    unsigned int cc = virtualM->registers[CC];
+    unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 1 || cc >> 30 == 2)
-        virtualM->registers[IP] = data;
+        vm->registers[IP] = data;
     else 
-        virtualM->registers[IP]++;
+        vm->registers[IP]++;
 }
 
-void JNN(VirtualMachine* virtualM) {
+void JNN(VirtualMachine* vm) {
     int bytes = 4;
-    int data = getData(virtualM, virtualM->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1], bytes);
 
-    unsigned int cc = virtualM->registers[CC];
+    unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0 || cc >> 30 == 1)
-        virtualM->registers[IP] = data;
+        vm->registers[IP] = data;
     else 
-        virtualM->registers[IP]++;
+        vm->registers[IP]++;
 }
