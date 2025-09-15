@@ -19,6 +19,7 @@ void SHL (VirtualMachine* vm) {
     int dataOp2 = getData(vm, vm->registers[OP2], bytes);
 
     setData(vm, vm->registers[OP1], dataOp1 << dataOp2, bytes);
+    updateCCRegisterHandler(vm, dataOp1 << dataOp2);
 }
 
 void SHR (VirtualMachine* vm) {
@@ -35,6 +36,7 @@ void SHR (VirtualMachine* vm) {
     }
 
     setData(vm, vm->registers[OP1], signBit & sar, bytes);
+    updateCCRegisterHandler(vm, signBit & sar);
 }
 
 void SAR (VirtualMachine* vm) {
@@ -44,6 +46,7 @@ void SAR (VirtualMachine* vm) {
     int dataOp2 = getData(vm, vm->registers[OP2], bytes);
 
     setData(vm, vm->registers[OP1], dataOp1 >> dataOp2, bytes);
+    updateCCRegisterHandler(vm, dataOp1 >> dataOp2);
 }
 
 void AND (VirtualMachine* vm) {
@@ -53,6 +56,7 @@ void AND (VirtualMachine* vm) {
     int dataOp2 = getData(vm, vm->registers[OP2], bytes);
 
     setData(vm, vm->registers[OP1], dataOp1 & dataOp2, bytes);
+    updateCCRegisterHandler(vm, dataOp1 & dataOp2);
 }
 
 void OR (VirtualMachine* vm) {
@@ -62,6 +66,7 @@ void OR (VirtualMachine* vm) {
     int dataOp2 = getData(vm, vm->registers[OP2], bytes);
 
     setData(vm, vm->registers[OP1], dataOp1 | dataOp2, bytes);
+    updateCCRegisterHandler(vm, dataOp1 | dataOp2);
 }
 
 void XOR (VirtualMachine* vm) {
@@ -71,6 +76,7 @@ void XOR (VirtualMachine* vm) {
     int dataOp2 = getData(vm, vm->registers[OP2], bytes);
 
     setData(vm, vm->registers[OP1], dataOp1 ^ dataOp2, bytes);
+    updateCCRegisterHandler(vm, dataOp1 ^ dataOp2);
 }
 
 void SWAP (VirtualMachine* vm) {
@@ -112,6 +118,7 @@ void RND(VirtualMachine* vm) {
     int randomValue = rand() % (dataOp2 + 1);
 
     setData(vm, vm->registers[OP1], randomValue, bytes);
+    updateCCRegisterHandler(vm, randomValue);
 }
 
 void JMP(VirtualMachine* virtualM) {
