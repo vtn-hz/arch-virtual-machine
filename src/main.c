@@ -9,6 +9,8 @@
     #include "vm_printer.h"
     #include "vm_runner.h"
 
+    #include "instructions.h"
+
     void getArguments(int argc, char** argv, char **fileContent, int *sizeFile, int *dissasembler);
     void getParsed(char **fileContent, int *sizeFile, char* path);
     void readIdentifier(FILE *file, int* sizeFile);
@@ -18,13 +20,11 @@
         int sizeFile;
         int dissasembler=0;
         getArguments(argc, argv, &fileContent, &sizeFile, &dissasembler);
-        
         VirtualMachine* virtualM = createVm(sizeFile,fileContent);
-        vmSetUp(virtualM, 0, 1); //assume code segment is 0 and data segment is 1 for now
         if (dissasembler) 
             virtualMachinePrint(virtualM);
         
-        virtualMachineRun(virtualM);
+        //virtualMachineRun(virtualM);
         //vmSetUp( virtual );
         //addSegment(&virtual->segment_table, 0xA);
         //addSegment(&virtual->segment_table, 200);
