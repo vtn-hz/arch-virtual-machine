@@ -14,6 +14,7 @@ void XOR (VirtualMachine*);
 void SWAP (VirtualMachine*);
 void LDL (VirtualMachine*);
 void LDH (VirtualMachine*);
+void RND (VirtualMachine*);
 void JMP (VirtualMachine*);
 void JZ (VirtualMachine*);
 void JP (VirtualMachine*);
