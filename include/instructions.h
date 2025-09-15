@@ -15,5 +15,12 @@ void SWAP (VirtualMachine*);
 void LDL (VirtualMachine*);
 void LDH (VirtualMachine*);
 void RND (VirtualMachine*);
+void JMP (VirtualMachine*);
+void JZ (VirtualMachine*);
+void JP (VirtualMachine*);
+void JN (VirtualMachine*);
+void JNZ (VirtualMachine*);
+void JNP (VirtualMachine*);
+void JNN (VirtualMachine*);
 
 #endif
