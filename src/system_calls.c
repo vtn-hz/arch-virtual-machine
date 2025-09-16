@@ -46,23 +46,26 @@ void writeChar(int value) {
 }
 
 void writeOctal(int value) {
+    printf("0o");
     printf("%o", value);
 }
 
 void writeHex(int value) {
+    printf("0x");
     printf("%X", value);
 }
 
 void writeBinary(int value) {
+    printf("0b");
     for (int i = (sizeof(value) - 2) * 8 - 1; i >= 0; i--) {
         putchar((value & (1 << i)) ? '1' : '0');
     }
 }
 
 void prepareDisplays(int mode, writeFunc funcs[], int *count) {
-    if (mode & 0b00001) funcs[(*count)++] = writeDecimal;
-    if (mode & 0b00010) funcs[(*count)++] = writeChar;
-    if (mode & 0b00100) funcs[(*count)++] = writeOctal;
-    if (mode & 0b01000) funcs[(*count)++] = writeHex;
     if (mode & 0b10000) funcs[(*count)++] = writeBinary;
+    if (mode & 0b01000) funcs[(*count)++] = writeHex;
+    if (mode & 0b00100) funcs[(*count)++] = writeOctal;
+    if (mode & 0b00010) funcs[(*count)++] = writeChar;
+    if (mode & 0b00001) funcs[(*count)++] = writeDecimal;
 }
