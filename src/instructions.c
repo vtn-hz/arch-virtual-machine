@@ -214,7 +214,7 @@ void JMP(VirtualMachine* vm) {
     int bytes = 4;
     int data = getData(vm, vm->registers[OP1], bytes);
     
-    vm->registers[IP] = data;    
+    vm->registers[IP] = vm->registers[CS] | data;
 }
 
 void JZ(VirtualMachine* vm) {
@@ -223,7 +223,7 @@ void JZ(VirtualMachine* vm) {
 
     unsigned int cc = vm->registers[CC]; 
     if (cc >> 30 == 1)
-        vm->registers[IP] = data;
+        vm->registers[IP] = vm->registers[CS] | data;
 
 }
 
@@ -233,7 +233,7 @@ void JP(VirtualMachine* vm) {
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0) 
-        vm->registers[IP] = data;
+        vm->registers[IP] = vm->registers[CS] | data;
 
 }
 
@@ -243,7 +243,7 @@ void JN(VirtualMachine* vm) {
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 2)
-        vm->registers[IP] = data;
+        vm->registers[IP] = vm->registers[CS] | data;
 
 }
 
@@ -253,7 +253,7 @@ void JNZ(VirtualMachine* vm) {
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0 || cc >> 30 == 2)
-        vm->registers[IP] = data;
+        vm->registers[IP] = vm->registers[CS] | data;
 
 }
 
@@ -263,7 +263,7 @@ void JNP(VirtualMachine* vm) {
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 1 || cc >> 30 == 2)
-        vm->registers[IP] = data;
+        vm->registers[IP] = vm->registers[CS] | data;
 }
 
 void JNN(VirtualMachine* vm) {
@@ -272,7 +272,7 @@ void JNN(VirtualMachine* vm) {
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0 || cc >> 30 == 1)
-        vm->registers[IP] = data;
+        vm->registers[IP] = vm->registers[CS] | data;
 
 }
 
