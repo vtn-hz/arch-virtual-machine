@@ -1,8 +1,10 @@
 #include "system_calls.h"
 #include "virtual_machine.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 int readDecimal() {
     int v; 
@@ -31,7 +33,9 @@ int readHex() {
 int readBinary() {
     char binStr[33];
     scanf("%32s", binStr);
-    return (int)strtol(binStr, NULL, 2);
+    int v = strtol(binStr, NULL, 2);
+    int s = 32 - log2(v);
+    return binStr[0] == '0' ? v : spreadSign(v, s); // if leading bit isn't 0, make it negative
 }
 
 void writeDecimal(int value) {
@@ -56,8 +60,9 @@ void writeHex(int value) {
 }
 
 void writeBinary(int value) {
+    int sign = 0; // adds leading bit(s) with sign
     printf("0b");
-    for (int i = (sizeof(value) - 2) * 8 - 1; i >= 0; i--) {
+    for (int i = value ? log2(abs(value)) + sign : 0; i >= 0; i--) {
         putchar((value & (1 << i)) ? '1' : '0');
     }
 }
