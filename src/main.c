@@ -21,11 +21,14 @@
         char *fileContent;
         int sizeFile;
         int dissasembler=0;
+        
         getArguments(argc, argv, &fileContent, &sizeFile, &dissasembler);
+
         VirtualMachine* virtualM = createVm(sizeFile,fileContent);
         if (dissasembler) 
             virtualMachinePrint(virtualM);
 
+        virtualMachineRun(virtualM);
         // virtualM->registers[OP1] = 0x031B0003;
         // virtualM->registers[OP2] = 0x02000000 + 'a';
         // virtualM->registers[OPC] = 0x00000010;

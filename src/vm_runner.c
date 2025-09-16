@@ -1,9 +1,14 @@
 #include <stdlib.h>
+#include <stdio.h>
+
 #include "vm_runner.h"
 #include "error_handler.h"
 #include "virtual_machine.h"
 #include "common_registers.h"
 #include "segment_table.h"
+
+#include "mnemonics_str.h"
+
 // #include <stdio.h>
 
 int isSegmentCodeEnded(VirtualMachine*);
@@ -16,8 +21,7 @@ void virtualMachineRun(VirtualMachine* virtualM) {
     while (!isSegmentCodeEnded(virtualM)) {
         prepareInstruction(virtualM);
         advanceInstructionPointer(virtualM);
-        // printf("mnm:%08X op1:%08X op2:%08X ip:%08X\n", virtualM->registers[OPC], virtualM->registers[OP1], virtualM->registers[OP2], virtualM->registers[IP]);
-        // executeInstruction(virtualM);
+        executeInstruction(virtualM);  
     }
 }
 
@@ -99,5 +103,5 @@ void executeInstruction(VirtualMachine* virtualM){
      *  - actualizar el CC si es necesario
      *  - actualizar el MAR MBR LAR si se accede a memoria
      */
-    //virtualM->instructions[ requestedInstruction ]();
+    virtualM->instructions[ requestedInstruction ]( virtualM );
 }
