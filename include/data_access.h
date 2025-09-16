@@ -6,6 +6,10 @@ typedef struct VirtualMachine VirtualMachine;
 int  getData(VirtualMachine*, int operand, int bytes);
 void setData(VirtualMachine*, int operand, int value, int bytes);
 
+void setDataToMemory(VirtualMachine*, int address, int value, int bytes);
+int getDataFromMemory(VirtualMachine*, int address, int bytes);
+
+
 typedef int(*p_getter_data)(VirtualMachine*, int operand, int bytes);
 typedef void(*p_setter_data)(VirtualMachine*, int operand, int value, int bytes);
 

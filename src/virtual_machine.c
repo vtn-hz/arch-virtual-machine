@@ -15,7 +15,6 @@ VirtualMachine* createVm(int codeSegmentSize,char *fileContent){
     virtualM->memory = (unsigned char*) malloc(MEMORY_SIZE);
 
     initSegmentTable(&virtualM->segment_table);
-    printf("after init segment table\n"); //debug
     addSegment(&virtualM->segment_table, codeSegmentSize);
     addSegment(&virtualM->segment_table, memorySizeLeft(virtualM->segment_table));//we add the data segment here, we'll have to change it when we add more segments
     /**
@@ -23,7 +22,7 @@ VirtualMachine* createVm(int codeSegmentSize,char *fileContent){
      * virtual machine will use it to set 
      * CodeSegment & DataSegment
     */
-    printf("before set memory content\n"); //debug
+    vmSetUp(virtualM, 0, 1);
     setMemoryContent(virtualM, fileContent, codeSegmentSize);
     return virtualM;
 }
@@ -46,11 +45,10 @@ void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSi
         error_handler.buildError("Error: el tamaño del contenido {%d} excede la memoria disponible", contentSize);
     }
     int address =transformLogicalAddress(virtualM->segment_table, virtualM->registers[CS]); //revise
-    printf("Code Segment Base: %d\n", address); //debug
+    
     for (int i = address; i < contentSize; i++)
         virtualM->memory[i] = fileContent[i];
-    for (int i=address; i<contentSize; i++)
-        printf("%02X ", (unsigned char)virtualM->memory[i]); //debug
+    
 }
 
 void releaseVm (VirtualMachine* virtualM) {
