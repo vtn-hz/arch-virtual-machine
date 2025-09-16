@@ -35,19 +35,22 @@ int readBinary() {
 }
 
 void writeDecimal(int value) {
-    printf("%d ", value);
+    printf("%d", value);
 }
 
 void writeChar(int value) {
-    printf("%c ", (char)value);
+    if (value >= 32 && value < 128)
+        printf("%c", (char)value);
+    else
+        printf(".");
 }
 
 void writeOctal(int value) {
-    printf("%o ", value);
+    printf("%o", value);
 }
 
 void writeHex(int value) {
-    printf("%X ", value);
+    printf("%X", value);
 }
 
 void writeBinary(int value) {
