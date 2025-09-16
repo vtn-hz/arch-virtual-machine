@@ -31,27 +31,28 @@ void setDataToInmediato (VirtualMachine *virtualM, int operand, int value, int b
     error_handler.buildError("Error: no se puede asignar a un inmediato");
 }
 
-void setDataToMemory(VirtualMachine *virtualM, int operand, int value, int bytes) {
-    DST segment_table = virtualM->segment_table; 
-    
+void setDataToMemory(VirtualMachine *vm, int operand, int value, int bytes) {
     int baseRegister = extractOperationBaseRegister( operand );
     int memoryOffset = extractOperationValue( operand );
 
-    int logicMemoryAccess = virtualM->registers[ baseRegister ] + memoryOffset;
-    int fisicMemoryAccess = transformLogicalAddress(segment_table, logicMemoryAccess);
+    prepareSetMemoryAccess( vm, baseRegister, memoryOffset, value, bytes );
+    commitSetMemoryAccess( vm );
+}
 
-    if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 
-        error_handler.segmentationFault(logicMemoryAccess);
-    
-    prepareMemoryAccessHandler( virtualM, logicMemoryAccess, fisicMemoryAccess, bytes);
+void prepareSetMemoryAccess(VirtualMachine *vm, int baseRegister, int memoryOffset, int value, int bytes) {
+    prepareMemoryAccessHandler( vm, baseRegister, memoryOffset, bytes );
+    vm->registers[MBR] = value;
+}
 
-    int buffer = value;
+void commitSetMemoryAccess(VirtualMachine *vm) {
+    int fisicMemoryAccess = vm->registers[MAR] & 0xFFFF;
+    int bytes = (vm->registers[MAR] >> 16) & 0x0000FFFF;
+    int buffer = vm->registers[MBR];
+
     for  (int i = bytes-1 ; i >= 0 ; i--) {
-        virtualM->memory[ fisicMemoryAccess + i ] = buffer & 0xFF ;
+        vm->memory[ fisicMemoryAccess + i ] = buffer & 0xFF ;
         buffer = buffer >> 8;        
     }
-
-    commitMemoryAccessHandler( virtualM, value );
 }
 
 void setDataToEmpty (VirtualMachine *virtualM, int operand, int value, int bytes) {

@@ -33,27 +33,28 @@ int getDataFromInmediato (VirtualMachine *virtualM, int operand, int bytes) {
 
 // ya deberiamos comenzar a utilizar el tipo int32_t
 int getDataFromMemory (VirtualMachine *virtualM, int operand, int bytes) {
-    DST segment_table = virtualM->segment_table; 
-    
     int baseRegister = extractOperationBaseRegister( operand );
     int memoryOffset = extractOperationValue( operand );
-
-    int logicMemoryAccess = virtualM->registers[ baseRegister ] + memoryOffset;
-    int fisicMemoryAccess = transformLogicalAddress(segment_table, logicMemoryAccess);
-
-    if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 
-        error_handler.segmentationFault(logicMemoryAccess);
     
-    prepareMemoryAccessHandler(virtualM, logicMemoryAccess, fisicMemoryAccess, bytes);
+    prepareMemoryAccessHandler( virtualM, baseRegister, memoryOffset, bytes );
+    return commitGetMemoryAccess( virtualM );
+}
+
+void prepareGetMemoryAccess(VirtualMachine *vm, int baseRegister, int memoryOffset, int bytes) {
+    prepareMemoryAccessHandler( vm, baseRegister, memoryOffset, bytes );
+}
+
+int commitGetMemoryAccess(VirtualMachine *vm) {
+    int fisicMemoryAccess = vm->registers[MAR] & 0xFFFF;
+    int bytes = (vm->registers[MAR] >> 16) & 0x0000FFFF;
 
     int readedData = 0 ;
     for  (int i=0 ; i<bytes ; i++) {
-        readedData = (readedData << 8) | virtualM->memory[ fisicMemoryAccess +  i ];        
+        readedData = (readedData << 8) | vm->memory[ fisicMemoryAccess +  i ];        
     }
     readedData = spreadSign( readedData, 32-bytes*8 );
-    commitMemoryAccessHandler( virtualM, readedData );
-
-    return readedData;
+    
+    return vm->registers[MBR] = readedData;
 }
 
 int getDataFromEmpty (VirtualMachine *virtualM, int operand, int bytes) {
