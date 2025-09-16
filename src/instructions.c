@@ -14,6 +14,8 @@
 
 #include "utils.h"
 
+#include "system_calls.h"
+
 void initializeInstructions(VirtualMachine* vm) {
     vm->instructions[0x00] = SYS;
     vm->instructions[0x01] = JMP;
@@ -59,6 +61,7 @@ void ADD(VirtualMachine* vm) {
     int bytes = 4;
     int data1 = getData(vm, vm->registers[OP1], bytes);
     int data2 = getData(vm, vm->registers[OP2], bytes);
+
     setData(vm, vm->registers[OP1], data1 + data2, bytes);
     updateCCRegisterHandler(vm, data1 + data2);
 }
@@ -95,7 +98,7 @@ void CMP(VirtualMachine* vm) {
     int bytes = 4;
     int data1 = getData(vm, vm->registers[OP1], bytes);
     int data2 = getData(vm, vm->registers[OP2], bytes);
-    updateCCRegisterHandler(virtualM, data1 - data2);
+    updateCCRegisterHandler(vm, data1 - data2);
 }
 
 void SHL(VirtualMachine* vm) {
@@ -221,8 +224,7 @@ void JZ(VirtualMachine* vm) {
     unsigned int cc = vm->registers[CC]; 
     if (cc >> 30 == 1)
         vm->registers[IP] = data;
-    else 
-        vm->registers[IP]++;
+
 }
 
 void JP(VirtualMachine* vm) {
@@ -232,8 +234,7 @@ void JP(VirtualMachine* vm) {
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0) 
         vm->registers[IP] = data;
-    else 
-        vm->registers[IP]++;
+
 }
 
 void JN(VirtualMachine* vm) {
@@ -243,8 +244,7 @@ void JN(VirtualMachine* vm) {
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 2)
         vm->registers[IP] = data;
-    else 
-        vm->registers[IP]++;
+
 }
 
 void JNZ(VirtualMachine* vm) {
@@ -254,8 +254,7 @@ void JNZ(VirtualMachine* vm) {
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0 || cc >> 30 == 2)
         vm->registers[IP] = data;
-    else 
-        vm->registers[IP]++;
+
 }
 
 void JNP(VirtualMachine* vm) {
@@ -265,8 +264,6 @@ void JNP(VirtualMachine* vm) {
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 1 || cc >> 30 == 2)
         vm->registers[IP] = data;
-    else 
-        vm->registers[IP]++;
 }
 
 void JNN(VirtualMachine* vm) {
@@ -276,8 +273,7 @@ void JNN(VirtualMachine* vm) {
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0 || cc >> 30 == 1)
         vm->registers[IP] = data;
-    else 
-        vm->registers[IP]++;
+
 }
 
 void SYS(VirtualMachine* virtualM){
