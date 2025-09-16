@@ -4,21 +4,28 @@
 
 #include "virtual_machine.h"
 
+#include "common_registers.h"
+
+#include "segment_table.h"
+
+#include "error_handler.h"
+
 #include "utils.h"
 
 void prepareMemoryAccessHandler (
     VirtualMachine* virtualM, 
-    int logicalAddress, int fisicAddress,
+    int baseRegister, int memoryOffset,
     int bytes
 ) {
-    virtualM->registers[LAR] = logicalAddress;
-    virtualM->registers[MAR] = (bytes << 16) | fisicAddress;
-}
+    DST segment_table = virtualM->segment_table;
+    int logicMemoryAccess = virtualM->registers[ baseRegister ] + memoryOffset;
+    int fisicMemoryAccess = transformLogicalAddress(segment_table, logicMemoryAccess);
 
-void commitMemoryAccessHandler (
-    VirtualMachine* virtualM, int data
-) {
-    virtualM->registers[MBR] = data;
+    if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 
+        error_handler.segmentationFault(logicMemoryAccess);
+
+    virtualM->registers[LAR] = logicMemoryAccess;
+    virtualM->registers[MAR] = (bytes << 16) | fisicMemoryAccess;
 }
 
 void updateCCRegisterHandler(VirtualMachine* virtualM, int result) {

@@ -276,14 +276,13 @@ void JNN(VirtualMachine* vm) {
 
 }
 
-void SYS(VirtualMachine* virtualM){
+void SYS(VirtualMachine* vm){
     int bytes = 4;
-    int pos = EDX<<16;
-    int quantity =virtualM->registers[ECX] & 0xFFFF;
-    int size = (virtualM->registers[ECX] >> 16) & 0xFFFF;
+    int quantity =vm->registers[ECX] & 0xFFFF;
+    int size = (vm->registers[ECX] >> 16) & 0xFFFF;
     //int size = (unsigned int)virtualM->registers[ECX] >> 16;
-    int mode = virtualM->registers[EAX];
-    int call = getData(virtualM, virtualM->registers[OP1], bytes);
+    int mode = vm->registers[EAX];
+    int call = getData(vm, vm->registers[OP1], bytes);
     //printf("EDX %08X\n",pos);
     //printf("tipo %d\n",call);
     //printf("size %d\n",size);
@@ -319,7 +318,8 @@ void SYS(VirtualMachine* virtualM){
 
         for (int i = 0; i < quantity; i++) {
             value = reader();
-            setDataToMemory(virtualM, pos+i*size, value, size);
+            prepareSetMemoryAccess(vm, EDX, i*size, value, size);
+            commitSetMemoryAccess(vm);
         }
     }
     else if(call==2) //write
@@ -329,7 +329,8 @@ void SYS(VirtualMachine* virtualM){
         prepareDisplays(mode, funcs, &count);
 
         for(int i=0; i<quantity; i++) { //preguntar, el original es i = 0; i<quantity
-            value = getDataFromMemory(virtualM, pos+i*size, size);
+            prepareGetMemoryAccess(vm, EDX, i*size, size);
+            value = commitGetMemoryAccess(vm);
             
             for (int j = 0; j < count; j++) {
                 if (j > 0) printf(" ");
@@ -353,4 +354,5 @@ void NOT(VirtualMachine* vm) {
     int bytes = 4;
     int data = getData(vm, vm->registers[OP1], bytes);
     setData(vm, vm->registers[OP1], ~data, bytes);
+    updateCCRegisterHandler(vm, ~data);
 }
