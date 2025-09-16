@@ -5,6 +5,8 @@ typedef struct VirtualMachine VirtualMachine;
 
 typedef void(*p_instruction)(VirtualMachine*);
 
+void initializeInstructions(VirtualMachine*);
+
 void MOV (VirtualMachine*);
 void ADD (VirtualMachine*);
 void SUB (VirtualMachine*);
