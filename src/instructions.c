@@ -317,6 +317,7 @@ void SYS(VirtualMachine* vm){
         }
 
         for (int i = 0; i < quantity; i++) {
+            printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
             value = reader();
             prepareSetMemoryAccess(vm, EDX, i*size, value, size);
             commitSetMemoryAccess(vm);
@@ -332,11 +333,11 @@ void SYS(VirtualMachine* vm){
             prepareGetMemoryAccess(vm, EDX, i*size, size);
             value = commitGetMemoryAccess(vm);
             
+            printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
             for (int j = 0; j < count; j++) {
                 if (j > 0) printf(" ");
                 funcs[j](value);
             }
-
             printf("\n");
         }
 
