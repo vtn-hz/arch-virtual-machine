@@ -1,9 +1,9 @@
 ejercicio,input,resultado obtenido,resultado esperado,error lanzado
 "Ej1","10 20 30","20","20",""
-"Ej2_a","","","","Error: {810f0200} falla de segmentación"
-"Ej2_b","","","","Error: {8104001B} falla de segmentación"
+"Ej2_a","0 1 0 1","10","10",""
+"Ej2_b","1 0 1 0","10","10",""
 "Ej3","10","0b011","0b01010",""
-"Ej4","","","","loop infinito"
+"Ej4_mari","4 6","24","24",""
 "Ej5","4","<no output>","24",""
 "Ej6","20 5","<no output>","4",""
 "Ej7","7","1","1",""
