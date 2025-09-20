@@ -2,7 +2,7 @@
 ; RESULTADO [4]
 
         MOV [4], 0
-OTRO:   MOV ECX, DS
+OTRO:   MOV EDX, DS
         LDL ECX, 1
         LDH ECX, 4
         MOV EAX, 0x01
