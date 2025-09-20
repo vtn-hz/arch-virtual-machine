@@ -1,6 +1,7 @@
 # Compilador y flags
 CC = gcc
 CFLAGS = -Wall -g -Iinclude
+LDFLAGS = -lm
 
 # Directorios
 SRC_DIR = src
@@ -18,7 +19,7 @@ all: $(TARGET)
 
 # Cómo generar el ejecutable
 $(TARGET): $(OBJ) | $(BIN_DIR)
-	$(CC) $(CFLAGS) $(OBJ) -o $@
+	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LDFLAGS)
 
 # Cómo generar cada .o a partir de un .c
 %.o: %.c
