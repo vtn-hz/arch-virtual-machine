@@ -60,14 +60,14 @@ void writeHex(int value) {
 }
 
 void writeBinary(int value) {
-    int sign = 0; // adds leading bit(s) with sign
+    int sign = 1; // adds leading bit(s) with sign
     printf("0b");
     for (int i = value ? log2(abs(value)) + sign : 0; i >= 0; i--) {
         putchar((value & (1 << i)) ? '1' : '0');
     }
 }
 
-void prepareDisplays(int mode, writeFunc funcs[], int *count) {
+void prepareDisplays(int mode, writeFunc funcs[], int* count) {
     if (mode & 0b10000) funcs[(*count)++] = writeBinary;
     if (mode & 0b01000) funcs[(*count)++] = writeHex;
     if (mode & 0b00100) funcs[(*count)++] = writeOctal;

@@ -4,15 +4,15 @@
 typedef struct VirtualMachine VirtualMachine;
 
 /**
- * comienza a ejecutar la maquina virtual, es solo visible
- * esta interfaz porque el resto es comportamiento interno
+ * Starts execution of the virtual machine.
+ * This is the only public interface, all other behavior is internal.
  */
-void virtualMachineRun( VirtualMachine* );
+void virtualMachineRun(VirtualMachine*);
 
 int isSegmentCodeEnded(VirtualMachine*);
 
-void prepareInstruction( VirtualMachine* );
+void prepareInstruction(VirtualMachine*);
 
-void advanceInstructionPointer( VirtualMachine* );
+void advanceInstructionPointer(VirtualMachine*);
 
 #endif

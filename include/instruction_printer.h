@@ -3,6 +3,6 @@
 
 typedef struct VirtualMachine VirtualMachine;
 
-void printInstruction( VirtualMachine* );
+void printInstruction(VirtualMachine*);
 
 #endif

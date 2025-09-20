@@ -12,54 +12,53 @@
 
 static p_setter_data availableDataSetter[4];
 
-void setData(VirtualMachine *virtualM, int operand, int value, int bytes) {
-    int operandType = extractOperationType( operand );
+void setData(VirtualMachine* vm, int operand, int value, int bytes) {
+    int operandType = extractOperationType(operand);
 
-    if (!(0 <= operandType && operandType <= 3)) {
+    if (!(0 <= operandType && operandType <= 3))
         error_handler.invalidOperand(operand);   
-    }
     
-    availableDataSetter[ operandType ](virtualM, operand, value, bytes);
+    availableDataSetter[operandType](vm, operand, value, bytes);
 }   
 
 
-void setDataToRegister(VirtualMachine *virtualM, int operand, int value, int bytes) {
-    virtualM->registers[ extractOperationValue(operand) ] = value;
+void setDataToRegister(VirtualMachine* vm, int operand, int value, int bytes) {
+    vm->registers[extractOperationValue(operand)] = value;
 }
 
-void setDataToInmediato (VirtualMachine *virtualM, int operand, int value, int bytes) {
+void setDataToInmediato(VirtualMachine* vm, int operand, int value, int bytes) {
     error_handler.buildError("Error: no se puede asignar a un inmediato");
 }
 
-void setDataToMemory(VirtualMachine *vm, int operand, int value, int bytes) {
-    int baseRegister = extractOperationBaseRegister( operand );
-    int memoryOffset = extractOperationValue( operand );
+void setDataToMemory(VirtualMachine* vm, int operand, int value, int bytes) {
+    int baseRegister = extractOperationBaseRegister(operand);
+    int memoryOffset = extractOperationValue(operand);
 
-    prepareSetMemoryAccess( vm, baseRegister, memoryOffset, value, bytes );
-    commitSetMemoryAccess( vm );
+    prepareSetMemoryAccess(vm, baseRegister, memoryOffset, value, bytes);
+    commitSetMemoryAccess(vm);
 }
 
-void prepareSetMemoryAccess(VirtualMachine *vm, int baseRegister, int memoryOffset, int value, int bytes) {
-    prepareMemoryAccessHandler( vm, baseRegister, memoryOffset, bytes );
+void prepareSetMemoryAccess(VirtualMachine* vm, int baseRegister, int memoryOffset, int value, int bytes) {
+    prepareMemoryAccessHandler(vm, baseRegister, memoryOffset, bytes);
     vm->registers[MBR] = value;
 }
 
-void commitSetMemoryAccess(VirtualMachine *vm) {
+void commitSetMemoryAccess(VirtualMachine* vm) {
     int fisicMemoryAccess = vm->registers[MAR] & 0xFFFF;
     int bytes = (vm->registers[MAR] >> 16) & 0x0000FFFF;
     int buffer = vm->registers[MBR];
 
     for  (int i = bytes-1 ; i >= 0 ; i--) {
-        vm->memory[ fisicMemoryAccess + i ] = buffer & 0xFF ;
+        vm->memory[fisicMemoryAccess + i] = buffer & 0xFF ;
         buffer = buffer >> 8;        
     }
 }
 
-void setDataToEmpty (VirtualMachine *virtualM, int operand, int value, int bytes) {
+void setDataToEmpty(VirtualMachine* vm, int operand, int value, int bytes) {
     error_handler.emptyOperand();
 }
 
-void initializeSetters () {
+void initializeSetters() {
     availableDataSetter[0] = setDataToEmpty;
     availableDataSetter[1] = setDataToRegister;
     availableDataSetter[2] = setDataToInmediato;

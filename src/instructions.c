@@ -53,12 +53,14 @@ void initializeInstructions(VirtualMachine* vm) {
 
 void MOV(VirtualMachine* vm) {
     int bytes = 4;
+
     int data = getData(vm, vm->registers[OP2], bytes);
     setData(vm, vm->registers[OP1], data, bytes);
 }
 
 void ADD(VirtualMachine* vm) {
     int bytes = 4;
+
     int data1 = getData(vm, vm->registers[OP1], bytes);
     int data2 = getData(vm, vm->registers[OP2], bytes);
 
@@ -68,27 +70,32 @@ void ADD(VirtualMachine* vm) {
 
 void SUB(VirtualMachine* vm) {
     int bytes = 4;
+
     int data1 = getData(vm, vm->registers[OP1], bytes);
     int data2 = getData(vm, vm->registers[OP2], bytes);
+
     setData(vm, vm->registers[OP1], data1 - data2, bytes);
     updateCCRegisterHandler(vm, data1 - data2);
 }
 
 void MUL(VirtualMachine* vm) {
     int bytes = 4;
+
     int data1 = getData(vm, vm->registers[OP1], bytes);
     int data2 = getData(vm, vm->registers[OP2], bytes);
+
     setData(vm, vm->registers[OP1], data1 * data2, bytes);
     updateCCRegisterHandler(vm, data1 * data2);
 }
 
 void DIV(VirtualMachine* vm) {
     int bytes = 4;
+
     int data1 = getData(vm, vm->registers[OP1], bytes);
     int data2 = getData(vm, vm->registers[OP2], bytes);
-    if (data2 == 0) {
+    if (data2 == 0)
         error_handler.divisionByZero(data1, data2);
-    }
+
     setData(vm, vm->registers[OP1], data1 / data2, bytes);
     updateCCRegisterHandler(vm, data1 / data2);
     vm->registers[AC] = data1 % data2; 
@@ -96,8 +103,10 @@ void DIV(VirtualMachine* vm) {
 
 void CMP(VirtualMachine* vm) {
     int bytes = 4;
+
     int data1 = getData(vm, vm->registers[OP1], bytes);
     int data2 = getData(vm, vm->registers[OP2], bytes);
+
     updateCCRegisterHandler(vm, data1 - data2);
 }
 
@@ -276,25 +285,22 @@ void JNN(VirtualMachine* vm) {
 
 }
 
-void SYS(VirtualMachine* vm){
+void SYS(VirtualMachine* vm) {
     int bytes = 4;
     int quantity =vm->registers[ECX] & 0xFFFF;
     int size = (vm->registers[ECX] >> 16) & 0xFFFF;
-    //int size = (unsigned int)virtualM->registers[ECX] >> 16;
     int mode = vm->registers[EAX];
     int call = getData(vm, vm->registers[OP1], bytes);
-    //printf("EDX %08X\n",pos);
-    //printf("tipo %d\n",call);
-    //printf("size %d\n",size);
     int value;
-    if(call==1) //read
-    { 
+
+    if(call == 1) { // read
         int (*reader)() = NULL;
 
         if (size != 1 && size != 2 && size != 4) {
             error_handler.buildError("Error: tamaño de dato inválido");
             return;
         }
+
         switch (mode) {
             case 0x01: 
                 reader = readDecimal; 
@@ -322,14 +328,12 @@ void SYS(VirtualMachine* vm){
             prepareSetMemoryAccess(vm, EDX, i*size, value, size);
             commitSetMemoryAccess(vm);
         }
-    }
-    else if(call==2) //write
-    { 
+    } else if(call == 2) { // write 
         int count = 0;
         writeFunc funcs[5];
         prepareDisplays(mode, funcs, &count);
 
-        for(int i=0; i<quantity; i++) { //preguntar, el original es i = 0; i<quantity
+        for(int i=0; i<quantity; i++) { // preguntar, el original es i = 0; i<quantity
             prepareGetMemoryAccess(vm, EDX, i*size, size);
             value = commitGetMemoryAccess(vm);
             
@@ -341,8 +345,7 @@ void SYS(VirtualMachine* vm){
             printf("\n");
         }
 
-    }
-    else {
+    } else {
         error_handler.buildError("Error: operacion de sistema invalida");
     }
 }

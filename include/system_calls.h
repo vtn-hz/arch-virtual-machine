@@ -17,4 +17,4 @@ void writeBinary(int value);
 
 void prepareDisplays(int, writeFunc*, int*);
 
-#endif // READ_FUNCTIONS_H
+#endif

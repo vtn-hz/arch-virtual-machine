@@ -10,7 +10,7 @@
 #define MEMORY_SIZE 16384 
 
 typedef struct VirtualMachine {
-    unsigned char *memory;
+    unsigned char* memory;
     int registers[32];
     DST segment_table;
 
@@ -18,17 +18,17 @@ typedef struct VirtualMachine {
 } VirtualMachine;
 
 /**
- * - instancia la vm, reserva 2^10*16 en memoria (*memory)
- * - crea los correspondientes segmentos
+ * Instantiates the virtual machine and allocates 2^10 * 16 bytes in memory (*memory).
+ * Creates the corresponding segments.
  * 
- * @return VirtualMachine*
+ * @return A pointer to the newly created VirtualMachine.
  */
-VirtualMachine* createVm (int codeSegmentSize, char *fileContent);
+VirtualMachine* createVm(int codeSegmentSize, char* fileContent);
 
 /**
- * inicializa los registros CS, DS, IP
+ * Initializes the registers CS, DS, and IP.
  */
-void vmSetUp (VirtualMachine*, int csSegment, int dsSegment);
+void vmSetUp(VirtualMachine*, int csSegment, int dsSegment);
 
 void setMemoryContent(VirtualMachine*, char*, int);
 

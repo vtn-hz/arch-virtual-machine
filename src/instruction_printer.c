@@ -11,94 +11,85 @@
 
 #include "error_handler.h"
 
-void printMnemonic( int opCode );
+void printMnemonic(int opCode);
 
-void printOperand( int operand );
+void printOperand(int operand);
 
-void printOperandRegister   ( int operand ) ;
-void printOperandInmmediate ( int operand ) ;
-void printOperandMemory     ( int operand ) ; 
+void printOperandRegister   (int operand);
+void printOperandInmmediate (int operand);
+void printOperandMemory     (int operand); 
 
-void printInstruction( VirtualMachine *vm ) {
+void printInstruction(VirtualMachine* vm) {
     int opCode = vm->registers[OPC];
     int operand1 = vm->registers[OP1];
     int operand2 = vm->registers[OP2];
     
-    printMnemonic( opCode );
+    printMnemonic(opCode);
     
+    if (extractOperationType(operand1) != 0)
+        printOperand(operand1);
 
-    if (extractOperationType( operand1 ) != 0) {
-        printOperand( operand1 );
-    }
-
-    if (extractOperationType( operand2 ) != 0) {
+    if (extractOperationType(operand2) != 0) {
         printf(",");
-        printOperand( operand2 );
+        printOperand(operand2);
     }
-
-
 }
 
-void printMnemonic( int opCode ) {
+void printMnemonic(int opCode) {
     if (opCode < 0 || opCode > 0x1F) 
         error_handler.invalidInstruction(opCode);
 
-    if ( MNEMONICS_STR[opCode] == NULL ) {
+    if (MNEMONICS_STR[opCode] == NULL)
         error_handler.invalidInstruction(opCode);
-    }
     
     printf("%-4s", MNEMONICS_STR[opCode]);
 }
 
-void printOperand ( int operand ) {
-    int operandType = extractOperationType( operand );
+void printOperand(int operand) {
+    int operandType = extractOperationType(operand);
 
     switch (operandType) {
         case 0x0: break;
-        case 0x1: printOperandRegister  ( operand ); break;
-        case 0x2: printOperandInmmediate( operand ); break;
-        case 0x3: printOperandMemory    ( operand ); break;
+        case 0x1: printOperandRegister  (operand); break;
+        case 0x2: printOperandInmmediate(operand); break;
+        case 0x3: printOperandMemory    (operand); break;
 
         default:
-            error_handler.invalidOperand( operandType );
+            error_handler.invalidOperand(operandType);
     }
 }
 
-void printOperandRegister( int operand ) {
-    int registerCode = extractOperationValue( operand );
+void printOperandRegister(int operand) {
+    int registerCode = extractOperationValue(operand);
 
-    if (registerCode < 0 || registerCode > 31) {
+    if (registerCode < 0 || registerCode > 31)
         error_handler.buildError("Error: {%x} es registro invalido ", registerCode);
-    }
 
-    if ( REGISTERS_STR[ registerCode ] == NULL ) {
+    if (REGISTERS_STR[registerCode] == NULL)
         error_handler.buildError("Error: {%x} es registro invalido ", registerCode);
-    }
 
-    printf("%10s", REGISTERS_STR[ registerCode ]);
+    printf("%10s", REGISTERS_STR[registerCode]);
 }
 
-void printOperandInmmediate( int operand ) {
+void printOperandInmmediate(int operand) {
     printf("%10d", extractOperationValue(operand));
 }
 
-void printOperandMemory( int operand ) {
-    int registerCode = extractOperationBaseRegister( operand );
-    int offset       = extractOperationValue( operand ); 
+void printOperandMemory(int operand) {
+    int registerCode = extractOperationBaseRegister(operand);
+    int offset       = extractOperationValue(operand); 
 
-    if (registerCode < 0 || registerCode > 31) {
+    if (registerCode < 0 || registerCode > 31)
         error_handler.buildError("Error: {%x} registro es invalido ", registerCode);
-    }
 
-    if ( REGISTERS_STR[ registerCode ] == NULL ) {
+    if (REGISTERS_STR[registerCode] == NULL)
         error_handler.buildError("Error: {%x} registro es invalido ", registerCode);
-    }
 
     char buffer[64];
     if (offset != 0) {
         char sign = offset > 0 ? '+' : '-';
         sprintf(buffer, "[%s %c %d]", REGISTERS_STR[registerCode], sign, offset);
-    }else
+    } else
         sprintf(buffer, "[%s]", REGISTERS_STR[registerCode]);
 
     printf("%10s", buffer);

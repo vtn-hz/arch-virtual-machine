@@ -12,13 +12,9 @@
 
 #include "utils.h"
 
-void prepareMemoryAccessHandler (
-    VirtualMachine* virtualM, 
-    int baseRegister, int memoryOffset,
-    int bytes
-) {
+void prepareMemoryAccessHandler(VirtualMachine* virtualM, int baseRegister, int memoryOffset, int bytes) {
     DST segment_table = virtualM->segment_table;
-    int logicMemoryAccess = virtualM->registers[ baseRegister ] + memoryOffset;
+    int logicMemoryAccess = virtualM->registers[baseRegister] + memoryOffset;
     int fisicMemoryAccess = transformLogicalAddress(segment_table, logicMemoryAccess);
 
     if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 

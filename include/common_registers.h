@@ -2,7 +2,8 @@
 #define COMMON_REGISTERS_H
 
 /**
- * https://learn.microsoft.com/es-es/cpp/c-language/c-enumeration-declarations?view=msvc-170
+ * Common registers used by the virtual machine.
+ * See: https://learn.microsoft.com/es-es/cpp/c-language/c-enumeration-declarations?view=msvc-170
  */
 enum CommonRegisters {
     LAR = 0,

@@ -4,7 +4,6 @@
 #include "error_handler.h"
 #include "virtual_machine.h"
 
-
 void initSegmentTable(DST* table) {
     table->counter = 0;
     for (int i = 0; i < DST_MAX; i++) {
@@ -14,8 +13,8 @@ void initSegmentTable(DST* table) {
 }
 
 static int calcLogicToPhysical(DST table, int logicalAddress) {
-    short int segment = (logicalAddress >> 16) & 0xFFFF; // extract segment (upper 8 bits)
-    short int offset = logicalAddress & 0xFFFF;        // extract offset (lower 8 bits)
+    short int segment = (logicalAddress >> 16) & 0xFFFF;
+    short int offset = logicalAddress & 0xFFFF;
     
     if (segment < 0 || segment >= table.counter)
         return -1;
@@ -30,15 +29,15 @@ static int calcLogicToPhysical(DST table, int logicalAddress) {
     return physicalAddress;
 }
 
-int transformLogicalAddress (DST table, int logicalAddress) {
+int transformLogicalAddress(DST table, int logicalAddress) {
     int physicalAddress = calcLogicToPhysical(table, logicalAddress);
-    if(physicalAddress == -1) 
+    if (physicalAddress == -1) 
         error_handler.segmentationFault(logicalAddress);
     
     return physicalAddress;
 }
 
-int isLogicalAddressValid (DST table, int logicalAddress) {
+int isLogicalAddressValid(DST table, int logicalAddress) {
     return calcLogicToPhysical(table, logicalAddress) != -1;
 }
 

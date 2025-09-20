@@ -4,7 +4,6 @@
 
 #include "error_handler.h"
 
-
 void fileNotFound() {
     buildError("Error: no se encontró el archivo");
 }
@@ -13,11 +12,11 @@ void invalidHeader() {
     buildError("Error: cabecera de archivo inválida");
 } 
 
-void invalidInstruction( int instruction ) { 
+void invalidInstruction(int instruction) { 
     buildError("Error: {%d} instrucción inválida", instruction);
 }
 
-void invalidOperand( int operador ) {
+void invalidOperand(int operador) {
     buildError("Error: {%d} operador inválido", operador);
 }
 
@@ -25,11 +24,11 @@ void emptyOperand() {
     buildError("Error: operador vacío");
 }
 
-void segmentationFault( int logical_address ) {
+void segmentationFault(int logical_address) {
     buildError("Error: {%x} falla de segmentación", logical_address);
 }
 
-void divisionByZero( int a, int b ) {
+void divisionByZero(int a, int b) {
     buildError("Error: {%d}/{%d} división por cero", a, b);
 }
 

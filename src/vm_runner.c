@@ -2,14 +2,16 @@
 #include <stdio.h>
 
 #include "vm_runner.h"
+
 #include "error_handler.h"
+
 #include "virtual_machine.h"
+#include "utils.h"
+
 #include "common_registers.h"
 #include "segment_table.h"
 
 #include "mnemonics_str.h"
-
-// #include <stdio.h>
 
 int isSegmentCodeEnded(VirtualMachine*);
 
@@ -25,16 +27,10 @@ void virtualMachineRun(VirtualMachine* virtualM) {
     }
 }
 
-/**
- * habria que agregarle una capa mas
- * a segment_table, de manera que se pueda
- * utilizar mas sencillo 
- * esta manera podria ser un ejemplo
- */
 int isSegmentCodeEnded(VirtualMachine* virtualM) {
     return !isLogicalAddressValid(
         virtualM->segment_table, 
-        virtualM->registers[ IP ]
+        virtualM->registers[IP]
     );
 }
 
@@ -42,7 +38,7 @@ void prepareInstruction(VirtualMachine* virtualM) {
     int index = transformLogicalAddress(virtualM->segment_table, virtualM->registers[IP]);
     unsigned char byte = virtualM->memory[index++];
     
-    virtualM->registers[OPC] = byte & 0x1F; // 0001 1111
+    virtualM->registers[OPC] = byte & 0x1F;
     
     char optarr[2] = {0};
     int n, oparr[2] = {OP1, OP2};
@@ -54,7 +50,6 @@ void prepareInstruction(VirtualMachine* virtualM) {
         n = 2;
     } else {
         optarr[0] = byte >> 2 & 0x03;
-        // optarr[1] = 0;
         n = optarr[0];
     }
 
@@ -69,12 +64,12 @@ void prepareInstruction(VirtualMachine* virtualM) {
         }
         
         if (optarr[i-1] == 2) { // if immediate, preserve sign
-            opaux = (opaux << 16) >> 16; // opaux = spreadSign(opaux, 16);
+            opaux = spreadSign(opaux, 16);
             opaux &= 0x00FFFFFF;
         }
 
         
-        virtualM->registers[oparr[i-1]] = (optarr[i-1] << 24) | opaux; // fills operands (type + value)
+        virtualM->registers[oparr[i-1]] = (optarr[i-1] << 24) | opaux;
     }
 }
 
@@ -85,23 +80,14 @@ void advanceInstructionPointer(VirtualMachine* virtualM) {
     virtualM->registers[IP] += 1 + tp1 + tp2;
 }
 
-void executeInstruction(VirtualMachine* virtualM){
+void executeInstruction(VirtualMachine* virtualM) {
     int requestedInstruction = virtualM->registers[OPC];
     
-    if (!(0 <= requestedInstruction && requestedInstruction <= 31)) {
+    if (!(0 <= requestedInstruction && requestedInstruction <= 31))
         error_handler.invalidInstruction(requestedInstruction);
-    }
 
-    if (virtualM->instructions[ requestedInstruction ] == NULL) {
+    if (virtualM->instructions[requestedInstruction] == NULL)
         error_handler.invalidInstruction(requestedInstruction);
-    }
 
-    /**
-     * a partir de este momento, la instruccion que haya sido invocada
-     * tiene la responsabilidad de: 
-     *  - si sus operandos no son los esperados lanzar un error
-     *  - actualizar el CC si es necesario
-     *  - actualizar el MAR MBR LAR si se accede a memoria
-     */
-    virtualM->instructions[ requestedInstruction ]( virtualM );
+    virtualM->instructions[requestedInstruction](virtualM);
 }

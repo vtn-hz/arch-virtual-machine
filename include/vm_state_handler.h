@@ -3,15 +3,9 @@
 
 typedef struct VirtualMachine VirtualMachine;
 
-void prepareMemoryAccessHandler (
-    VirtualMachine* virtualM, 
-    int logicalAddress, int fisicAddress,
-    int bytes
-);
+void prepareMemoryAccessHandler(VirtualMachine* virtualM, int logicalAddress, int fisicAddress, int bytes);
 
-void commitMemoryAccessHandler (
-    VirtualMachine* virtualM, int data
-);
+void commitMemoryAccessHandler(VirtualMachine* virtualM, int data);
 
 void updateCCRegisterHandler(VirtualMachine* virtualM, int result);
 

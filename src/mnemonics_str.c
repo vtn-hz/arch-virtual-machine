@@ -2,36 +2,36 @@
 #include <stddef.h>
 
 const char* MNEMONICS_STR[32] = {
-    /* 0x00 */ "SYS",
-    /* 0x01 */ "JMP",
-    /* 0x02 */ "JZ",
-    /* 0x03 */ "JP",
-    /* 0x04 */ "JN",
-    /* 0x05 */ "JNZ",
-    /* 0x06 */ "JNP",
-    /* 0x07 */ "JNN",
-    /* 0x08 */ "NOT",
-    /* 0x09 */ NULL,
-    /* 0x0A */ NULL,
-    /* 0x0B */ NULL,
-    /* 0x0C */ NULL,
-    /* 0x0D */ NULL,
-    /* 0x0E */ NULL,
-    /* 0x0F */ "STOP",
-    /* 0x10 */ "MOV",
-    /* 0x11 */ "ADD",
-    /* 0x12 */ "SUB",
-    /* 0x13 */ "MUL",
-    /* 0x14 */ "DIV",
-    /* 0x15 */ "CMP",
-    /* 0x16 */ "SHL",
-    /* 0x17 */ "SHR",
-    /* 0x18 */ "SAR",
-    /* 0x19 */ "AND",
-    /* 0x1A */ "OR",
-    /* 0x1B */ "XOR",
-    /* 0x1C */ "SWAP",
-    /* 0x1D */ "LDL",
-    /* 0x1E */ "LDH",
-    /* 0x1F */ "RND"
+    "SYS",  // 0x00
+    "JMP",  // 0x01
+    "JZ",   // 0x02
+    "JP",   // 0x03
+    "JN",   // 0x04
+    "JNZ",  // 0x05
+    "JNP",  // 0x06
+    "JNN",  // 0x07
+    "NOT",  // 0x08
+    NULL,   // 0x09
+    NULL,   // 0x0A
+    NULL,   // 0x0B
+    NULL,   // 0x0C
+    NULL,   // 0x0D
+    NULL,   // 0x0E
+    "STOP", // 0x0F
+    "MOV",  // 0x10
+    "ADD",  // 0x11
+    "SUB",  // 0x12
+    "MUL",  // 0x13
+    "DIV",  // 0x14
+    "CMP",  // 0x15
+    "SHL",  // 0x16
+    "SHR",  // 0x17
+    "SAR",  // 0x18
+    "AND",  // 0x19
+    "OR",   // 0x1A
+    "XOR",  // 0x1B
+    "SWAP", // 0x1C
+    "LDL",  // 0x1D
+    "LDH",  // 0x1E
+    "RND",  // 0x1F
 };

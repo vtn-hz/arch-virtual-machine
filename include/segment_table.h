@@ -7,26 +7,27 @@ typedef struct {
     unsigned short size;
 } ST;
 
-typedef struct{
+typedef struct {
     ST descriptors[DST_MAX];
     unsigned short counter;
 } DST;
 
 void initSegmentTable(DST* tableSegment);
-/**
-*   Devuelve recibe la memoria logica
-*   aplica la base correspondiente enviada por el tableSegment
-*   pasandola de logica a fisica
-*   @return int
-*/
-int transformLogicalAddress (DST tableSegment, int logicalAddress);
 
 /**
-*   Devuelve 1 o 0 (bool) acorde a si tiene el accesso permitido 
-*   a dicha memoria o no (Segmentation Fault)
-*   @return bool
-*/ 
-int isLogicalAddressValid (DST tableSegment, int logicalAddress);
+ * Converts a logical address to a physical address using
+ * the base of the corresponding segment from tableSegment.
+ * 
+ * @return The corresponding physical address (int).
+ */
+int transformLogicalAddress(DST tableSegment, int logicalAddress);
+
+/**
+ * Checks whether access to a given logical address is permitted.
+ * 
+ * @return 1 if access is permitted, 0 otherwise (segmentation fault).
+ */ 
+int isLogicalAddressValid(DST tableSegment, int logicalAddress);
 
 void addSegment(DST* table, unsigned short size);
 

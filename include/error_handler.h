@@ -13,11 +13,11 @@ void divisionByZero(int, int);
 
 void buildError(const char* context, ...);
 
-typedef void(*p_void_error_handler)(void);
-typedef void(*p_int_error_handler)(int);
-typedef void(*p_int_int_error_handler)(int, int);
+typedef void (*p_void_error_handler)(void);
+typedef void (*p_int_error_handler)(int);
+typedef void (*p_int_int_error_handler)(int, int);
 
-typedef void(*p_custom_error_handler)(const char* context, ...);
+typedef void (*p_custom_error_handler)(const char* context, ...);
 
 typedef struct {
     p_void_error_handler fileNotFound; 
