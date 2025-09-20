@@ -323,9 +323,12 @@ void SYS(VirtualMachine* vm) {
         }
 
         for (int i = 0; i < quantity; i++) {
+            prepareMemoryAccessHandler(vm, EDX, i*size, size);
+
             printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
             value = reader();
-            prepareSetMemoryAccess(vm, EDX, i*size, value, size);
+            
+            prepareMBRHandler(vm, value);
             commitSetMemoryAccess(vm);
         }
     } else if(call == 2) { // write 
