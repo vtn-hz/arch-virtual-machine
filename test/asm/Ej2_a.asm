@@ -22,7 +22,7 @@
 
         MOV [4], 0
         MOV EFX, 1
-OTRO:   MOV ECX, DS
+OTRO:   MOV EDX, DS
         LDL ECX, 1
         LDH ECX, 4
         MOV EAX, 0x01
