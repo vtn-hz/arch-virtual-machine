@@ -13,10 +13,10 @@
 
 void printMnemonic(int opCode);
 
-void printOperand(int operand);
+void printOperand(int operand, int opCode);
 
 void printOperandRegister   (int operand);
-void printOperandInmmediate (int operand);
+void printOperandInmmediate (int operand, int opCode);
 void printOperandMemory     (int operand); 
 
 void printInstruction(VirtualMachine* vm) {
@@ -27,11 +27,11 @@ void printInstruction(VirtualMachine* vm) {
     printMnemonic(opCode);
     
     if (extractOperationType(operand1) != 0)
-        printOperand(operand1);
+        printOperand(operand1, opCode);
 
     if (extractOperationType(operand2) != 0) {
         printf(",");
-        printOperand(operand2);
+        printOperand(operand2, opCode);
     }
 }
 
@@ -45,13 +45,13 @@ void printMnemonic(int opCode) {
     printf("%-4s", MNEMONICS_STR[opCode]);
 }
 
-void printOperand(int operand) {
+void printOperand(int operand, int opCode) {
     int operandType = extractOperationType(operand);
 
     switch (operandType) {
         case 0x0: break;
         case 0x1: printOperandRegister  (operand); break;
-        case 0x2: printOperandInmmediate(operand); break;
+        case 0x2: printOperandInmmediate(operand, opCode); break;
         case 0x3: printOperandMemory    (operand); break;
 
         default:
@@ -71,8 +71,15 @@ void printOperandRegister(int operand) {
     printf("%10s", REGISTERS_STR[registerCode]);
 }
 
-void printOperandInmmediate(int operand) {
-    printf("%10d", extractOperationValue(operand));
+void printOperandInmmediate(int operand, int opCode) {
+    char buffer[64];
+    int printedInmmediate = extractOperationValue(operand);
+    if (0x01 <= opCode && opCode <= 0x07) 
+        sprintf(buffer, "0x%X", printedInmmediate);
+    else
+        sprintf(buffer, "%d", printedInmmediate); 
+
+    printf("%10s", buffer);
 }
 
 void printOperandMemory(int operand) {
