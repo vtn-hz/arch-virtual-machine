@@ -52,7 +52,8 @@ int commitGetMemoryAccess(VirtualMachine* vm) {
     }
     readedData = spreadSign(readedData, 32-bytes*8);
     
-    return vm->registers[MBR] = readedData;
+    prepareMBRHandler(vm, readedData);
+    return vm->registers[MBR];
 }
 
 int getDataFromEmpty(VirtualMachine* vm, int operand, int bytes) {

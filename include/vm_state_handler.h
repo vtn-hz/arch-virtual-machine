@@ -5,7 +5,7 @@ typedef struct VirtualMachine VirtualMachine;
 
 void prepareMemoryAccessHandler(VirtualMachine* virtualM, int logicalAddress, int fisicAddress, int bytes);
 
-void commitMemoryAccessHandler(VirtualMachine* virtualM, int data);
+void prepareMBRHandler(VirtualMachine* virtualM, int value);
 
 void updateCCRegisterHandler(VirtualMachine* virtualM, int result);
 

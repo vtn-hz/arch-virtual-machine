@@ -24,6 +24,10 @@ void prepareMemoryAccessHandler(VirtualMachine* virtualM, int baseRegister, int 
     virtualM->registers[MAR] = (bytes << 16) | fisicMemoryAccess;
 }
 
+void prepareMBRHandler(VirtualMachine* virtualM, int value) {
+    virtualM->registers[MBR] = value;
+}
+
 void updateCCRegisterHandler(VirtualMachine* virtualM, int result) {
     virtualM->registers[CC] = 0;
 

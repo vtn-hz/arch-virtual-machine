@@ -40,7 +40,7 @@ void setDataToMemory(VirtualMachine* vm, int operand, int value, int bytes) {
 
 void prepareSetMemoryAccess(VirtualMachine* vm, int baseRegister, int memoryOffset, int value, int bytes) {
     prepareMemoryAccessHandler(vm, baseRegister, memoryOffset, bytes);
-    vm->registers[MBR] = value;
+    prepareMBRHandler(vm, value);
 }
 
 void commitSetMemoryAccess(VirtualMachine* vm) {
