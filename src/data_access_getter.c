@@ -34,7 +34,7 @@ int getDataFromMemory(VirtualMachine* vm, int operand, int bytes) {
     int baseRegister = extractOperationBaseRegister(operand);
     int memoryOffset = extractOperationValue(operand);
     
-    prepareMemoryAccessHandler(vm, baseRegister, memoryOffset, bytes);
+    prepareGetMemoryAccess(vm, baseRegister, memoryOffset, bytes);
     return commitGetMemoryAccess(vm);
 }
 
