@@ -22,6 +22,5 @@ ejercicio,input,resultado obtenido,resultado esperado,error lanzado
 "Ej12","","","",""
 "Ej12_valen","2 4 1 2 3 4 5 6 7 8","1 2 3 4","1 2 3 4",""
 "Ej13","","","",""
-"hello","","","",""
-"results","","","",""
-"sample","","","",""
+"hello","","0b01001000 H 0b01101111 o 0b01101100 l 0b01100001 a","0b01001000 H 0b01101111 o 0b01101100 l 0b01100001 a",""
+"sample","","6","6",""
