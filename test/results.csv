@@ -15,6 +15,7 @@ ejercicio,input,resultado obtenido,resultado esperado,error lanzado
 "Ej8_mari","4 5 2 -1","1 2 1","1 2 1",""
 "Ej9","8 5 14 10 2","0 1 1 0","0 1 1 0",""
 "Ej9_mari","8 5 14 10 2","0 1 1 0","0 1 1 0",""
+"Ej10_a_val","1 2 3 4 -1 1 2 4","3","3",""
 "Ej10_b","","","",""
 "Ej11","","","",""
 "Ej11t","","","",""
