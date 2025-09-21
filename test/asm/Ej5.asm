@@ -2,6 +2,9 @@
 ; EEX guarda n - 1
 ; EBX guarda el contador
 ; ECX guarda el resultado
+; Necesito re-iniciar ECX cada vez porque en cada nueva multiplicación, el resultado anterior se sumaba 
+; una vez extra como "valor inicial", en lugar de empezar la suma desde 0.
+; La multiplicación por suma siempre debe empezar desde 0, no desde el resultado de la multiplicación anterior.
 
 INICIO: MOV EDX,DS
         MOV EAX,1
@@ -19,7 +22,7 @@ INICIO: MOV EDX,DS
         MOV EEX, EAX
         SUB EEX, 1 ; Obtengo n - 1
         MOV EBX, EEX ; Inicializo contador
-        MOV ECX, 0
+        XOR ECX, ECX ; Inicializo en cero
 
 MULT_LOOP: CMP EBX, 0
 	  JZ LOOP
@@ -29,9 +32,17 @@ MULT_LOOP: CMP EBX, 0
 
 LOOP:   MOV EAX, ECX ; Nuevo n
         SUB EEX, 1   ; Nuevo n - 1
-        MOV EBX, EEX ; Actualizo contador
         CMP EEX, 1
         JZ FIN
+        MOV EBX, EEX ; Actualizo contador
+        XOR ECX, ECX ; Inicializo en cero  
         JMP MULT_LOOP
 
-FIN:     STOP
+FIN:    MOV [DS+4], ECX ; esto es para leer de prueba, no va en el ejercicio original
+        MOV EDX, DS
+        ADD EDX, 4
+        LDL ECX, 0x01
+        LDH ECX, 0x04
+        MOV EAX, 1
+        SYS 2  
+        STOP
