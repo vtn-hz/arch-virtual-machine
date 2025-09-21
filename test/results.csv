@@ -3,6 +3,7 @@ ejercicio,input,resultado obtenido,resultado esperado,error lanzado
 "Ej2_a","0 1 0 1","10","10",""
 "Ej2_b","1 0 1 0","10","10",""
 "Ej3","10","0b011","0b01010",""
+"Ej3_mari","5","0b0....0101","0b0....0101",""
 "Ej4_mari","4 6","24","24",""
 "Ej5","4","24","24",""
 "EJ5_lau","4","24","24",""
