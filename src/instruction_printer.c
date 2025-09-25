@@ -95,6 +95,7 @@ void printOperandMemory(int operand) {
     char buffer[64];
     if (offset != 0) {
         char sign = offset > 0 ? '+' : '-';
+        offset = offset > 0 ? offset : -offset;
         sprintf(buffer, "[%s %c %d]", REGISTERS_STR[registerCode], sign, offset);
     } else
         sprintf(buffer, "[%s]", REGISTERS_STR[registerCode]);
