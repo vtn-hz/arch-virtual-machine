@@ -50,7 +50,7 @@ void prepareInstruction(VirtualMachine* virtualM) {
         n = 2;
     } else {
         optarr[0] = byte >> 2 & 0x03;
-        n = optarr[0];
+        n = optarr[0] > 0; // 1 if there is an operand, 0 otherwise
     }
 
     virtualM->registers[OP1] = virtualM->registers[OP2] = 0;

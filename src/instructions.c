@@ -333,17 +333,22 @@ void SYS(VirtualMachine* vm) {
         }
     } else if(call == 2) { // write 
         int count = 0;
-        writeFunc funcs[5];
+        writeFunc funcs[5], charfunc = writeChar;
         prepareDisplays(mode, funcs, &count);
 
-        for(int i=0; i<quantity; i++) { // preguntar, el original es i = 0; i<quantity
+        for(int i=0; i<quantity; i++) {
             prepareGetMemoryAccess(vm, EDX, i*size, size);
             value = commitGetMemoryAccess(vm);
             
             printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
             for (int j = 0; j < count; j++) {
                 if (j > 0) printf(" ");
-                funcs[j](value);
+
+                if (funcs[j] == charfunc)
+                    for (int k = size-1; k >= 0; k--)
+                        funcs[j](value >> k * 8 & 0xFF);
+                else
+                    funcs[j](value);
             }
             printf("\n");
         }
