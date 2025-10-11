@@ -6,10 +6,11 @@ LDFLAGS = -lm
 # Directorios
 SRC_DIR = src
 BIN_DIR = bin
+OBJ_DIR = $(BIN_DIR)/obj
 
-# Archivos fuente y objetos
-SRC = $(wildcard $(SRC_DIR)/*.c) # Todos los .c en src
-OBJ = $(SRC:.c=.o) # Cambia .c por .o
+# Buscar todos los .c recursivamente en src y subdirectorios
+SRC = $(shell find $(SRC_DIR) -name "*.c")
+OBJ = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC))
 
 # Nombre del ejecutable
 TARGET = $(BIN_DIR)/vmx
@@ -22,13 +23,17 @@ $(TARGET): $(OBJ) | $(BIN_DIR)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LDFLAGS)
 
 # Cómo generar cada .o a partir de un .c
-%.o: %.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Crear directorio bin si no existe
+# Crear directorios si no existen
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
 # Limpiar compilación
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -rf $(OBJ_DIR) $(TARGET)
