@@ -11,7 +11,9 @@ typedef struct VirtualMachine VirtualMachine;
 
 char askDebugAction () ;
 
-int isDebugMode( VirtualMachine* );
+int isDebugEnabled( void* ); 
+
+int isDebugMode( VirtualMachine*, void* );
 
 void solveDebugAction( VirtualMachine*, char*, char ) ; 
 

@@ -5,7 +5,14 @@
 
 #include "vm_mode.h"
 
-int isDebugMode( VirtualMachine* vm ) {
+int isDebugEnabled( void* params ) {
+    return 1; // check params
+}
+
+int isDebugMode( VirtualMachine* vm, void* params ) {
+    if ( !isDebugEnabled(params) ) 
+        return 0;
+
     return vm->mode == DEBUG_MODE;
 }
 
