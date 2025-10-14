@@ -5,6 +5,8 @@
 #include "arguments_parsing.h"
 #include "error_handler.h"
 
+void dispatchArguments(char** argv, int i, int argc, arguments* args);
+int solveArgumentType(char* argument, int i);
 
 void getArguments(int argc, char** argv, arguments* args) {
     args->currentVmx = NULL;
@@ -13,23 +15,23 @@ void getArguments(int argc, char** argv, arguments* args) {
     args->dissasembler = 0;
     args->paramsAmount = 0;
 
-    int i;    
+    int i = 0;    
     // check if input has required arguments
     if (argc < 2)
         error_handler.fileNotFound();
-    
-    for(i = 1; i < argc; i++) {
-        dispatchArguments(argv, i, argc, args);
-    }
+
+    while ( i < argc && (strcmp(argv[i], "-p") != 0) ) {
+        dispatchArguments(argv, ++i, argc, args);
+    }    
 
     if(args->currentVmx == NULL && args->currentVmi== NULL)
         error_handler.buildError("Error: se requiere un archivo .vmx o .vmi");
 }
 
 int solveArgumentType(char* argument, int i) {
-    char** argsType = {
+    char* argsType[5] = {
         ".vmx", // 1 vmx file
-        ".vmi"  // 2 vmi file
+        ".vmi",  // 2 vmi file
         "m=",   // 3 memory size
         "-d",   // 4 dissasembler
         "-p",   // 5 params
@@ -54,18 +56,18 @@ int solveArgumentType(char* argument, int i) {
 }
 
 void dispatchArguments(char** argv, int i, int argc, arguments* args) {
-    int argumentType = solveArgumentType(argv[i], i-1);
+    int argumentType = solveArgumentType(argv[i], i - 1);
 
     switch (argumentType)
     {
         case 1: // vmx
-            args->currentVmx = argv[i + 1];
+            args->currentVmx = argv[i];
             break;
         case 2: // vmi
-            args->currentVmi = argv[i + 1];
+            args->currentVmi = argv[i];
             break;
         case 3: // memory size
-            args->memory_size = atoi(argv[i + 1]+2); // skip "m="
+            args->memory_size = atoi(argv[i] + 2); // skip "m="
             break;
         case 4: // dissasembler
             args->dissasembler = 1;

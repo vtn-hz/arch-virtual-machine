@@ -18,11 +18,17 @@ void readIdentifier(FILE* file, int* version);
 int main(int argc, char** argv) {
     char* fileContent;
     arguments args;
-    int sizes[6] = 0; //order: param, const, code, data, extra, stack (same as to be saved in memory)
+    //int sizes[6] = 0; //order: param, const, code, data, extra, stack (same as to be saved in memory)
 
     getArguments(argc, argv, &args); // code segment size
 
-
+    printf("Archivo .vmx: %s\n", args.currentVmx);
+    printf("Archivo .vmi: %s\n", args.currentVmi);
+    printf("Tamaño memoria: %d KB\n", args.memory_size);
+    printf("Disasembler: %d\n", args.dissasembler);
+    printf("Cantidad de parametros: %d\n", args.paramsAmount);
+    for (int i = 0; i < args.paramsAmount; i++)
+        printf("Parametro %d: %s\n", i + 1, args.params[i]);
     // getParsed(fileContent,sizeFile,path);
 
     //VirtualMachine* virtualM = createVm(sizes, args, fileContent);
