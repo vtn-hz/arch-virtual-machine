@@ -15,6 +15,8 @@ typedef struct VirtualMachine {
     DST segment_table;
 
     p_instruction instructions[32];
+
+    char mode;
 } VirtualMachine;
 
 /**
