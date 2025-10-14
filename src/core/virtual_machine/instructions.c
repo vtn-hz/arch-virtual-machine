@@ -356,7 +356,7 @@ void SYS(VirtualMachine* vm) {
         }
 
     }else if ( call == 0xF ) {
-        vm->mode = GO_MODE;
+        vm->mode = DEBUG_MODE;
     } else {
         error_handler.buildError("Error: operacion de sistema invalida");
     }
