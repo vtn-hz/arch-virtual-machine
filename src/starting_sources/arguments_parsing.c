@@ -9,13 +9,14 @@ void dispatchArguments(char** argv, int i, int argc, arguments* args);
 int solveArgumentType(char* argument, int i);
 
 void getArguments(int argc, char** argv, arguments* args) {
+    int i = 0;    
+    
     args->currentVmx = NULL;
     args->currentVmi = NULL;
     args->memory_size = 16; // default 16KB
     args->dissasembler = 0;
     args->paramsAmount = 0;
 
-    int i = 0;    
     // check if input has required arguments
     if (argc < 2)
         error_handler.fileNotFound();
