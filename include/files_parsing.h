@@ -1,0 +1,12 @@
+#ifndef FILES_PARSING_H
+#define FILES_PARSING_H
+
+void getParsed(char** codeSegmentContent, char** constSegmentContent, int sizes[], arguments* args, int* entryPoint);
+void vmxVersionOne(FILE* file, char **codeSegmentContent, int sizes[]);
+void vmxVersionTwo(FILE* file,char **codeSegmentContent, char** constSegmentContent, int* entryPoint, int sizes[]);
+void vmiVersionOne(FILE* file, char** codeSegmentContent, arguments* args, int sizes[]);
+void readIdentifier(FILE* file, int* version);
+
+#endif
+
+
