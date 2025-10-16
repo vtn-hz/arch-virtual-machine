@@ -3,6 +3,8 @@
 
 #include "virtual_machine.h"
 
+#include "vm_mode.h"
+
 #include "segment_table.h"
 
 #include "data_access.h"
@@ -29,6 +31,8 @@ void vmSetUp(VirtualMachine* virtualM, int csSegment, int dsSegment) {
     registers[DS] = dsSegment << 16;
 
     registers[IP] = registers[CS];
+
+    virtualM->mode = GO_MODE; // if it was restored may be initilized with DEBUG_MODE
 
     initializeGetters();
     initializeSetters();

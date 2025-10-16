@@ -13,6 +13,8 @@
 
 #include "mnemonics_str.h"
 
+#include "vm_mode.h"
+
 int isSegmentCodeEnded(VirtualMachine*);
 
 void prepareInstruction(VirtualMachine*);
@@ -21,6 +23,11 @@ void executeInstruction(VirtualMachine*);
 
 void virtualMachineRun(VirtualMachine* virtualM) {
     while (!isSegmentCodeEnded(virtualM)) {
+
+        if ( isDebugMode(virtualM, virtualM /*params*/) ) {
+            solveDebugAction(virtualM, "file.vmi", askDebugAction()); 
+        }
+      
         prepareInstruction(virtualM);
         advanceInstructionPointer(virtualM);
         executeInstruction(virtualM);  

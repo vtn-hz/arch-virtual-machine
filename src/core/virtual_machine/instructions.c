@@ -10,6 +10,8 @@
 
 #include "vm_state_handler.h"
 
+#include "vm_mode.h"
+
 #include "error_handler.h"
 
 #include "utils.h"
@@ -353,6 +355,8 @@ void SYS(VirtualMachine* vm) {
             printf("\n");
         }
 
+    }else if ( call == 0xF ) {
+        vm->mode = DEBUG_MODE;
     } else {
         error_handler.buildError("Error: operacion de sistema invalida");
     }
