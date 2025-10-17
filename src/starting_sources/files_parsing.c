@@ -7,6 +7,8 @@
 
 #include "arguments_parsing.h"
 
+#include "virtual_machine.h"
+
 void getParsed(char** codeSegmentContent, char** constSegmentContent, arguments* args, int sizes[], int* entryPoint) {    
     FILE* file;
     int version;
@@ -42,6 +44,8 @@ void vmxVersionOne(FILE* file, char **codeSegmentContent, int sizes[]){
 
     *codeSegmentContent = (char*) malloc(sizes[2]);
     fread(*codeSegmentContent, sizeof(char), sizes[2], file);
+
+    sizes[3] = DEFAULT_MEMORY_SIZE - sizes[2]; //rest of memory is data segment
 }
 
 void vmxVersionTwo(FILE* file,char **codeSegmentContent, char** constSegmentContent, int* entryPoint, int sizes[]){
