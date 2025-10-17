@@ -30,6 +30,11 @@ void vmSetUp(VirtualMachine* virtualM, int csSegment, int dsSegment) {
     registers[CS] = csSegment << 16; 
     registers[DS] = dsSegment << 16;
 
+    registers[28] = -1;
+    registers[29] = -1;
+    registers[30] = -1;
+    registers[31] = -1;
+
     registers[IP] = registers[CS];
 
     virtualM->mode = GO_MODE; // if it was restored may be initilized with DEBUG_MODE

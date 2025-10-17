@@ -18,6 +18,8 @@
 
 #include "system_calls.h"
 
+#include "vm_image.h"
+
 void initializeInstructions(VirtualMachine* vm) {
     vm->instructions[0x00] = SYS;
     vm->instructions[0x01] = JMP;
@@ -295,7 +297,7 @@ void SYS(VirtualMachine* vm) {
     int call = getData(vm, vm->registers[OP1], bytes);
     int value;
 
-    if(call == 1) { // read
+    if (call == 0x1) { // read
         int (*reader)() = NULL;
 
         if (size != 1 && size != 2 && size != 4) {
@@ -333,7 +335,7 @@ void SYS(VirtualMachine* vm) {
             prepareMBRHandler(vm, value);
             commitSetMemoryAccess(vm);
         }
-    } else if(call == 2) { // write 
+    } else if (call == 0x2) { // write 
         int count = 0;
         writeFunc funcs[5], charfunc = writeChar;
         prepareDisplays(mode, funcs, &count);
@@ -355,8 +357,13 @@ void SYS(VirtualMachine* vm) {
             printf("\n");
         }
 
-    }else if ( call == 0xF ) {
+    } else if (call == 0x3) {
+
+    } else if (call == 0x4) {
+        
+    } else if (call == 0xF) {
         vm->mode = DEBUG_MODE;
+        buildImage(vm);
     } else {
         error_handler.buildError("Error: operacion de sistema invalida");
     }
