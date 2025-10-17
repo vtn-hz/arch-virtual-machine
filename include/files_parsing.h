@@ -1,3 +1,5 @@
+#include "arguments_parsing.h"
+
 #ifndef FILES_PARSING_H
 #define FILES_PARSING_H
 
