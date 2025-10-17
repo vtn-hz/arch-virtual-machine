@@ -12,7 +12,9 @@ typedef struct {
     unsigned short counter;
 } DST;
 
-void initSegmentTable(DST* tableSegment);
+void createSegmentTable(DST* table);
+
+void initSegmentTable(DST* table, int sizes[], int registers[]);
 
 /**
  * Converts a logical address to a physical address using

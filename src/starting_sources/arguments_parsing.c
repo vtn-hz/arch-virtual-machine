@@ -5,10 +5,10 @@
 #include "arguments_parsing.h"
 #include "error_handler.h"
 
-void dispatchArguments(char** argv, int i, int argc, arguments* args);
+void dispatchArguments(char** argv, int i, int argc, arguments* args, int sizes[]);
 int solveArgumentType(char* argument, int i);
 
-void getArguments(int argc, char** argv, arguments* args) {
+void getArguments(int argc, char** argv, arguments* args, int sizes[]) {
     int i = 0;    
     
     args->currentVmx = NULL;
@@ -22,7 +22,7 @@ void getArguments(int argc, char** argv, arguments* args) {
         error_handler.fileNotFound();
 
     while ( i < argc && (strcmp(argv[i], "-p") != 0) ) {
-        dispatchArguments(argv, ++i, argc, args);
+        dispatchArguments(argv, ++i, argc, args, sizes);
     }    
 
     if(args->currentVmx == NULL && args->currentVmi== NULL)
@@ -56,7 +56,7 @@ int solveArgumentType(char* argument, int i) {
     return solvedArgumentType;
 }
 
-void dispatchArguments(char** argv, int i, int argc, arguments* args) {
+void dispatchArguments(char** argv, int i, int argc, arguments* args, int sizes[]) {
     int argumentType = solveArgumentType(argv[i], i - 1);
 
     switch (argumentType)
@@ -78,7 +78,9 @@ void dispatchArguments(char** argv, int i, int argc, arguments* args) {
             for (int j = i + 1; j < argc; j++) {
                 args->params[args->paramsAmount] = argv[j];
                 args->paramsAmount++;
+                sizes[0]+= strlen(argv[j]) + 1; // +1 for null terminator
             }
+            sizes[0]+=args->paramsAmount*4; // for pointers
             break;  
         default:
             error_handler.buildError("Error: argumento desconocido {%s}", argv[i]);
