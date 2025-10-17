@@ -12,6 +12,6 @@ typedef struct arguments{
     int paramsAmount;
 } arguments;
 
-void getArguments(int argc, char** argv, arguments* args);
+void getArguments(int argc, char** argv, arguments* args, int sizes[]);
 
 #endif
