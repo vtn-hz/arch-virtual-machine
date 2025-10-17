@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
     char* constSegmentContent;
     int sizes[6] = {0}; //order: param, const, code, data, extra, stack (same as to be saved in memory)
 
-    getArguments(argc, argv, &args); // code segment size
+    getArguments(argc, argv, &args, sizes); // code segment size
 
     /**
      printf("Archivo .vmx: %s\n", args.currentVmx);
