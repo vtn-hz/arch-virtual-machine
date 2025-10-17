@@ -51,7 +51,7 @@ void vmxVersionOne(FILE* file, char **codeSegmentContent, int sizes[]){
 void vmxVersionTwo(FILE* file,char **codeSegmentContent, char** constSegmentContent, int* entryPoint, int sizes[]){
     
     readSizes(file, sizes);
-    fread((unsigned char)entryPoint, sizeof(char),2,file); 
+    fread(entryPoint, sizeof(short int), 1, file); 
     *codeSegmentContent = (char*) malloc(sizes[2]);
     fread(*codeSegmentContent, sizeof(char), sizes[2], file);
     if(sizes[1]){
