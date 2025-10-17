@@ -7,7 +7,7 @@
 
 #include "common_registers.h"
 
-#define MEMORY_SIZE 16384 
+#define DEFAULT_MEMORY_SIZE 16384 
 
 typedef struct VirtualMachine {
     unsigned char* memory;
