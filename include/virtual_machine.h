@@ -25,12 +25,16 @@ typedef struct VirtualMachine {
  * 
  * @return A pointer to the newly created VirtualMachine.
  */
-VirtualMachine* createVm(int codeSegmentSize, char* fileContent);
+void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeSegmentContent, char* constSegmentContent, char* paramSegmentContent, int paramsSize);
+
+void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]);
 
 /**
- * Initializes the registers CS, DS, and IP.
+ * Initializes the segment table registers and IP.
  */
-void vmSetUp(VirtualMachine*, int csSegment, int dsSegment);
+void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint);
+
+void vmSetUp(VirtualMachine*);
 
 void setMemoryContent(VirtualMachine*, char*, int);
 
