@@ -1,76 +1,143 @@
 #include "system_calls.h"
+
+#include "io_system_calls.h"
+
 #include "virtual_machine.h"
+
+#include "vm_state_handler.h"
+
+#include "data_access.h"
+
+#include "vm_mode.h"
+
+#include "error_handler.h"
+
 #include "utils.h"
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <stdio.h>
 
-int readDecimal() {
-    int v; 
-    scanf("%d", &v); 
-    return v;
-}
+void dispatchSystemCall(VirtualMachine *vm) {
+    int call = getData(vm, vm->registers[OP1]);
 
-int readChar() {
-    char c; 
-    scanf("%c", &c); 
-    return (int)c;
-}
+    switch(call){
+        case 0x1: systemCallRead(vm);       break; 
+        case 0x2: systemCallWrite(vm);      break; 
+        case 0x3: systemCallStringRead(vm); break; 
+        case 0x4: systemCallStringWrite(vm);break; 
+        case 0x7: systemCallClrScreen(vm);  break; 
+        case 0xF: systemCallBreakpoint(vm); break; 
+        
+        default: error_handler.buildError("Error: operacion de sistema invalida");
+    }
+} 
 
-int readOctal() {
-    int v;
-    scanf("%o", &v); 
-    return v;
-}
+void systemCallRead(VirtualMachine *vm) {
+    int quantity = vm->registers[ECX] & 0xFFFF;
+    int size = applyMaskAfter(vm->registers[ECX], 0xFFFF, 16);
+    int mode = vm->registers[EAX];
 
-int readHex() {
-    int v; 
-    scanf("%x", &v); 
-    return v;
-}
+    if (size != 1 && size != 2 && size != 4) {
+        error_handler.buildError("Error: tamaño de dato inválido");
+        return;
+    }
 
-int readBinary() {
-    char binStr[33];
-    scanf("%32s", binStr);
-    int v = strtol(binStr, NULL, 2);
-    int s = 32 - log2(v);
-    return binStr[0] == '0' ? v : spreadSign(v, s); // if leading bit isn't 0, make it negative
-}
+    int (*reader)() = NULL;
 
-void writeDecimal(int value) {
-    printf("%d", value);
-}
+    switch (mode) {
+        case 0x01: reader = readDecimal; break;
+        case 0x02: reader = readChar;    break;
+        case 0x04: reader = readOctal;   break;
+        case 0x08: reader = readHex;     break;
+        case 0x10: reader = readBinary;  break;
+        
+        default:
+            error_handler.buildError("Error: modo de lectura invalido");
+    }
 
-void writeChar(int value) {
-    if (value >= 32 && value < 128)
-        printf("%c", (char)value);
-    else
-        printf(".");
-}
 
-void writeOctal(int value) {
-    printf("0o");
-    printf("%o", value);
-}
+    for (int i = 0; i < quantity; i++) {
+        prepareMemoryAccessHandler(vm, EDX, i*size, size);
 
-void writeHex(int value) {
-    printf("0x");
-    printf("%X", value);
-}
-
-void writeBinary(int value) {
-    int sign = 1; // adds leading bit(s) with sign
-    printf("0b");
-    for (int i = value ? log2(abs(value)) + sign : 0; i >= 0; i--) {
-        putchar((value & (1 << i)) ? '1' : '0');
+        printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
+        int value = reader();
+        
+        prepareMBRHandler(vm, value);
+        commitSetMemoryAccess(vm);
     }
 }
 
-void prepareDisplays(int mode, writeFunc funcs[], int* count) {
-    if (mode & 0b10000) funcs[(*count)++] = writeBinary;
-    if (mode & 0b01000) funcs[(*count)++] = writeHex;
-    if (mode & 0b00100) funcs[(*count)++] = writeOctal;
-    if (mode & 0b00010) funcs[(*count)++] = writeChar;
-    if (mode & 0b00001) funcs[(*count)++] = writeDecimal;
+void systemCallWrite(VirtualMachine *vm) {
+    int quantity = vm->registers[ECX] & 0xFFFF;
+    int size = applyMaskAfter(vm->registers[ECX], 0xFFFF, 16);
+    int mode = vm->registers[EAX];
+
+    int count = 0;
+    writeFunc funcs[5], charfunc = writeChar;
+    prepareDisplays(mode, funcs, &count);
+
+
+    for(int i=0; i<quantity; i++) {
+        prepareGetMemoryAccess(vm, EDX, i*size, size);
+        int value = commitGetMemoryAccess(vm);
+        
+        printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
+        for (int j = 0; j < count; j++) {
+            if (j > 0) printf(" ");
+
+            if (funcs[j] == charfunc)
+                for (int k = size-1; k >= 0; k--)
+                    funcs[j](value >> k * 8 & 0xFF);
+            else
+                funcs[j](value);
+        }
+        printf("\n");
+    }
+}
+
+void systemCallStringRead(VirtualMachine* vm) {
+    int saveLocation = transformLogicalAddress(vm->segment_table, vm->registers[EDX]);
+    int limit = spreadSign(vm->registers[ECX] & 0xFFFF, 16);
+    
+    if (limit < -1)
+        error_handler.buildError("Error: limite invalido para lectura de string");
+    
+    int hasLimit = limit != -1;
+
+    printf("[%04X]: ", saveLocation);
+
+    unsigned char buffer[BUFFER_SIZE];
+    fgets((char*) buffer, hasLimit ? limit + 1 : sizeof(buffer), stdin);
+
+    int offset = 0;
+    while( buffer[offset] != '\0' &&  buffer[offset] != '\n' ) {
+        prepareSetMemoryAccess(vm, EDX, offset, buffer[offset], 1);
+        commitSetMemoryAccess(vm);
+        offset++;
+    }
+
+    prepareSetMemoryAccess(vm, EDX, offset, '\0', 1);
+    commitSetMemoryAccess(vm);
+}
+
+void systemCallStringWrite(VirtualMachine* vm) {
+    int readLocation = transformLogicalAddress(vm->segment_table, vm->registers[EDX]);
+
+    unsigned char buffer[BUFFER_SIZE];
+    int offset = 0;
+    
+    do {
+        prepareGetMemoryAccess(vm, EDX, offset, 1);
+        buffer[offset] = commitGetMemoryAccess(vm);
+    } while(buffer[offset++] != '\0');
+
+    printf("[%04X]: %s\n", readLocation, buffer);
+}
+
+void systemCallClrScreen(VirtualMachine* vm) {
+    system( CLEAR_COMMAND );
+}
+
+void systemCallBreakpoint(VirtualMachine* vm) {
+    vm->mode = DEBUG_MODE;
 }
