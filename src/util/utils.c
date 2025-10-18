@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "utils.h"
 
 int applyMask(int number, int mask, int shiftright_slots) {
