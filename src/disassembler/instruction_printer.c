@@ -17,7 +17,7 @@ void printOperand(int operand, int opCode);
 
 void printInstruction(VirtualMachine* vm);
 
-void rawInstructionPrint(VirtualMachine* vm);
+void rawInstructionPrint(VirtualMachine* vm, int entryPoint);
 
 void printOperandRegister   (int operand);
 
@@ -25,8 +25,8 @@ void printOperandInmmediate (int operand, int opCode);
 
 void printOperandMemory     (int operand); 
 
-void printVirtualMachineState(VirtualMachine* vm) {
-    rawInstructionPrint(vm);
+void printVirtualMachineState(VirtualMachine* vm, int entryPoint) {
+    rawInstructionPrint(vm, entryPoint);
     printf(" | ");
     printInstruction(vm);
     printf("\n");
@@ -116,7 +116,7 @@ void printOperandMemory(int operand) {
     printf("%10s", buffer);
 }
 
-void rawInstructionPrint(VirtualMachine* vm) {
+void rawInstructionPrint(VirtualMachine* vm, int entryPoint) {
     int marginLeft = 8;
     int opaSize = extractOperationType(vm->registers[OP1]);
     int opbSize = extractOperationType(vm->registers[OP2]);
@@ -130,6 +130,11 @@ void rawInstructionPrint(VirtualMachine* vm) {
 
     int totalSize = opcSize + opaSize + opbSize;
     int fisicIp = transformLogicalAddress(vm->segment_table, vm->registers[IP]);
+
+    if (entryPoint == (vm->registers[IP] & 0xFFFF))
+        printf(" ");
+    else
+        printf(">");
 
     printf("[%04X]", fisicIp);
     for(int i=fisicIp; i < fisicIp + totalSize ; i++) 

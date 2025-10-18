@@ -3,6 +3,6 @@
 
 typedef struct VirtualMachine VirtualMachine;
 
-void printVirtualMachineState(VirtualMachine*);
+void printVirtualMachineState(VirtualMachine*, int entryPoint);
 
 #endif

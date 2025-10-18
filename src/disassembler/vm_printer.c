@@ -29,7 +29,7 @@ void virtualMachinePrintCodeSegment(VirtualMachine* vm) {
     
     while (!isSegmentCodeEnded(vm)) {
         prepareInstruction(vm);
-        printVirtualMachineState(vm);
+        printVirtualMachineState(vm, entryPoint);
         advanceInstructionPointer(vm);
     }
 
