@@ -26,7 +26,7 @@ char* arrToChars(int* intVec, int vecSize) {
 
 void buildImage(VirtualMachine* vm) {
     // arguments
-    char* path = "vmi/test6.vmi";
+    char* path = "vmi/testv2.vmi";
     unsigned short size = 0xFFFF;
     //
 

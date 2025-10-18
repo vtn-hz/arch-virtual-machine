@@ -99,7 +99,7 @@ void readIdentifier(FILE* file, int* version) { // assumes file exists
 
     fread(title, sizeof(char), 6, file);
 
-    if(strncmp(title, "VMX25", 5)!=0 || strncmp(title, "VMI25",5)!=0)
+    if(strncmp(title, "VMX25", 5)!=0 && strncmp(title, "VMI25",5)!=0)
         error_handler.invalidHeader();
 
     *version = (unsigned char)title[5] - '0';
