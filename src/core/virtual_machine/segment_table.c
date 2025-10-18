@@ -12,16 +12,13 @@ void createSegmentTable(DST* table) {
     }
 }
 
-void initSegmentTable(DST* table, int sizes[], int registers[]) { //could be called by createVm or the function that extracts data from files
-    int reg[] = {-1};
+void initSegmentTable(DST* table, int sizes[], int reg[]) { //could be called by createVm or the function that extracts data from files
 
     for(int i = 0; i < DST_MAX; i++)
         if(sizes[i] > 0){
             addSegment(table, sizes[i]);
             reg[i] = (table->counter -1) << 16; // segment number in high bytes. again, order: param, const, code, data, extra, stack (same as to be saved in memory)
         }
-
-    // call function that sets registers accordingly
 }
 
 static int calcLogicToPhysical(DST table, int logicalAddress) {
