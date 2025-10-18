@@ -14,6 +14,8 @@
 
 #include "arguments_parsing.h"
 
+#include "files_parsing.h"
+
 VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
     VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
     

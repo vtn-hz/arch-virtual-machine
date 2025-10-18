@@ -7,6 +7,8 @@
 
 #include "common_registers.h"
 
+#include "arguments_parsing.h"
+
 #define DEFAULT_MEMORY_SIZE 16384 
 
 typedef struct VirtualMachine {
