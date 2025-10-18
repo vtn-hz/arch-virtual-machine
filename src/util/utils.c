@@ -20,3 +20,14 @@ int extractOperationValue(int operand) {
 int extractOperationBaseRegister(int operand) {
     return applyMask(operand, 0x00FF0000, 16);
 }
+
+char* intToString(int number){
+    char* cad = ( char*) malloc (4 * sizeof(char));
+
+    cad[0] = ((number >> 24) & 0xFF) + '0';
+    cad[1] = ((number >> 16) & 0xFF) + '0';
+    cad[2] = ((number >> 8) & 0xFF) + '0';
+    cad[3] = (number & 0xFF) + '0';    
+    
+    return cad;
+}
