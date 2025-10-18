@@ -32,6 +32,10 @@ void JNP(VirtualMachine*);
 void JNN(VirtualMachine*);
 void SYS(VirtualMachine*);
 void NOT(VirtualMachine*);
+void PUSH(VirtualMachine*);
+void POP(VirtualMachine*);
+void CALL(VirtualMachine*);
+void RET(VirtualMachine*);
 void STOP(VirtualMachine*);
 
 #endif
