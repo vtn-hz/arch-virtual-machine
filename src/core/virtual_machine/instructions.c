@@ -54,183 +54,149 @@ void initializeInstructions(VirtualMachine* vm) {
 }
 
 void MOV(VirtualMachine* vm) {
-    int bytes = 4;
-
-    int data = getData(vm, vm->registers[OP2], bytes);
-    setData(vm, vm->registers[OP1], data, bytes);
+    int data = getData(vm, vm->registers[OP2]);
+    setData(vm, vm->registers[OP1], data);
 }
 
 void ADD(VirtualMachine* vm) {
-    int bytes = 4;
+    int data1 = getData(vm, vm->registers[OP1]);
+    int data2 = getData(vm, vm->registers[OP2]);
 
-    int data1 = getData(vm, vm->registers[OP1], bytes);
-    int data2 = getData(vm, vm->registers[OP2], bytes);
-
-    setData(vm, vm->registers[OP1], data1 + data2, bytes);
+    setData(vm, vm->registers[OP1], data1 + data2);
     updateCCRegisterHandler(vm, data1 + data2);
 }
 
 void SUB(VirtualMachine* vm) {
-    int bytes = 4;
+    int data1 = getData(vm, vm->registers[OP1]);
+    int data2 = getData(vm, vm->registers[OP2]);
 
-    int data1 = getData(vm, vm->registers[OP1], bytes);
-    int data2 = getData(vm, vm->registers[OP2], bytes);
-
-    setData(vm, vm->registers[OP1], data1 - data2, bytes);
+    setData(vm, vm->registers[OP1], data1 - data2);
     updateCCRegisterHandler(vm, data1 - data2);
 }
 
 void MUL(VirtualMachine* vm) {
-    int bytes = 4;
+    int data1 = getData(vm, vm->registers[OP1]);
+    int data2 = getData(vm, vm->registers[OP2]);
 
-    int data1 = getData(vm, vm->registers[OP1], bytes);
-    int data2 = getData(vm, vm->registers[OP2], bytes);
-
-    setData(vm, vm->registers[OP1], data1 * data2, bytes);
+    setData(vm, vm->registers[OP1], data1 * data2);
     updateCCRegisterHandler(vm, data1 * data2);
 }
 
 void DIV(VirtualMachine* vm) {
-    int bytes = 4;
-
-    int data1 = getData(vm, vm->registers[OP1], bytes);
-    int data2 = getData(vm, vm->registers[OP2], bytes);
+    int data1 = getData(vm, vm->registers[OP1]);
+    int data2 = getData(vm, vm->registers[OP2]);
     if (data2 == 0)
         error_handler.divisionByZero(data1, data2);
 
-    setData(vm, vm->registers[OP1], data1 / data2, bytes);
+    setData(vm, vm->registers[OP1], data1 / data2);
     updateCCRegisterHandler(vm, data1 / data2);
     vm->registers[AC] = data1 % data2; 
 }
 
 void CMP(VirtualMachine* vm) {
-    int bytes = 4;
-
-    int data1 = getData(vm, vm->registers[OP1], bytes);
-    int data2 = getData(vm, vm->registers[OP2], bytes);
+    int data1 = getData(vm, vm->registers[OP1]);
+    int data2 = getData(vm, vm->registers[OP2]);
 
     updateCCRegisterHandler(vm, data1 - data2);
 }
 
 void SHL(VirtualMachine* vm) {
-    int bytes = 4;
+    int dataOp1 = getData(vm, vm->registers[OP1]);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
-    int dataOp1 = getData(vm, vm->registers[OP1], bytes);
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
-
-    setData(vm, vm->registers[OP1], dataOp1 << dataOp2, bytes);
+    setData(vm, vm->registers[OP1], dataOp1 << dataOp2);
     updateCCRegisterHandler(vm, dataOp1 << dataOp2);
 }
 
 void SHR(VirtualMachine* vm) {
-    int bytes = 4;
-
-    int dataOp1 = getData(vm, vm->registers[OP1], bytes);
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
+    int dataOp1 = getData(vm, vm->registers[OP1]);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
     int sar = dataOp1 >> dataOp2;
     int signBit = 0xFFFFFFFF;
     if (dataOp2 > 0) {
-        signBit = 0x80000000 >> (32 - bytes*8);
+        signBit = 0x80000000 >> (32 *8);
         signBit = ~(signBit >> (dataOp2 - 1));
     }
 
-    setData(vm, vm->registers[OP1], signBit & sar, bytes);
+    setData(vm, vm->registers[OP1], signBit & sar);
     updateCCRegisterHandler(vm, signBit & sar);
 }
 
 void SAR(VirtualMachine* vm) {
-    int bytes = 4;
+    int dataOp1 = getData(vm, vm->registers[OP1]);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
-    int dataOp1 = getData(vm, vm->registers[OP1], bytes);
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
-
-    setData(vm, vm->registers[OP1], dataOp1 >> dataOp2, bytes);
+    setData(vm, vm->registers[OP1], dataOp1 >> dataOp2);
     updateCCRegisterHandler(vm, dataOp1 >> dataOp2);
 }
 
 void AND(VirtualMachine* vm) {
-    int bytes = 4;
+    int dataOp1 = getData(vm, vm->registers[OP1]);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
-    int dataOp1 = getData(vm, vm->registers[OP1], bytes);
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
-
-    setData(vm, vm->registers[OP1], dataOp1 & dataOp2, bytes);
+    setData(vm, vm->registers[OP1], dataOp1 & dataOp2);
     updateCCRegisterHandler(vm, dataOp1 & dataOp2);
 }
 
 void OR(VirtualMachine* vm) {
-    int bytes = 4;
+    int dataOp1 = getData(vm, vm->registers[OP1]);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
-    int dataOp1 = getData(vm, vm->registers[OP1], bytes);
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
-
-    setData(vm, vm->registers[OP1], dataOp1 | dataOp2, bytes);
+    setData(vm, vm->registers[OP1], dataOp1 | dataOp2);
     updateCCRegisterHandler(vm, dataOp1 | dataOp2);
 }
 
 void XOR(VirtualMachine* vm) {
-    int bytes = 4;
+    int dataOp1 = getData(vm, vm->registers[OP1]);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
-    int dataOp1 = getData(vm, vm->registers[OP1], bytes);
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
-
-    setData(vm, vm->registers[OP1], dataOp1 ^ dataOp2, bytes);
+    setData(vm, vm->registers[OP1], dataOp1 ^ dataOp2);
     updateCCRegisterHandler(vm, dataOp1 ^ dataOp2);
 }
 
 void SWAP(VirtualMachine* vm) {
-    int bytes = 4;
+    int dataOp1 = getData(vm, vm->registers[OP1]);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
-    int dataOp1 = getData(vm, vm->registers[OP1], bytes);
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
-
-    setData(vm, vm->registers[OP1], dataOp2, bytes);
-    setData(vm, vm->registers[OP2], dataOp1, bytes);
+    setData(vm, vm->registers[OP1], dataOp2);
+    setData(vm, vm->registers[OP2], dataOp1);
 }
 
 void LDL(VirtualMachine* vm) {
-    int bytes = 4;
-
-    int dataOp1 = getData(vm, vm->registers[OP1], bytes);
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
+    int dataOp1 = getData(vm, vm->registers[OP1]);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
     int loadedLow = (dataOp1 & 0xFFFF0000) | (dataOp2 & 0x0000FFFF);
-    setData(vm, vm->registers[OP1], loadedLow, bytes);
+    setData(vm, vm->registers[OP1], loadedLow);
 }
 
 void LDH(VirtualMachine* vm) {
-    int bytes = 4;
-
-    int dataOp1 = getData(vm, vm->registers[OP1], bytes);
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
+    int dataOp1 = getData(vm, vm->registers[OP1]);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
     int loadedHigh = (dataOp1 & 0x0000FFFF) | ((dataOp2 & 0x0000FFFF) << 16);
-    setData(vm, vm->registers[OP1], loadedHigh, bytes);
+    setData(vm, vm->registers[OP1], loadedHigh);
 }
 
 void RND(VirtualMachine* vm) {
-    int bytes = 4;
-
-    int dataOp2 = getData(vm, vm->registers[OP2], bytes);
+    int dataOp2 = getData(vm, vm->registers[OP2]);
 
     srand(time(NULL));
     int randomValue = rand() % (dataOp2 + 1);
 
-    setData(vm, vm->registers[OP1], randomValue, bytes);
+    setData(vm, vm->registers[OP1], randomValue);
     updateCCRegisterHandler(vm, randomValue);
 }
 
 void JMP(VirtualMachine* vm) {
-    int bytes = 4;
-    int data = getData(vm, vm->registers[OP1], bytes);
+int data = getData(vm, vm->registers[OP1]);
     
     vm->registers[IP] = vm->registers[CS] | data;
 }
 
 void JZ(VirtualMachine* vm) {
-    int bytes = 4;
-    int data = getData(vm, vm->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1]);
 
     unsigned int cc = vm->registers[CC]; 
     if (cc >> 30 == 1)
@@ -239,8 +205,7 @@ void JZ(VirtualMachine* vm) {
 }
 
 void JP(VirtualMachine* vm) {
-    int bytes = 4;
-    int data = getData(vm, vm->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1]);
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0) 
@@ -249,8 +214,7 @@ void JP(VirtualMachine* vm) {
 }
 
 void JN(VirtualMachine* vm) {
-    int bytes = 4;
-    int data = getData(vm, vm->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1]);
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 2)
@@ -259,8 +223,7 @@ void JN(VirtualMachine* vm) {
 }
 
 void JNZ(VirtualMachine* vm) {
-    int bytes = 4;
-    int data = getData(vm, vm->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1]);
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0 || cc >> 30 == 2)
@@ -269,8 +232,7 @@ void JNZ(VirtualMachine* vm) {
 }
 
 void JNP(VirtualMachine* vm) {
-    int bytes = 4;
-    int data = getData(vm, vm->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1]);
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 1 || cc >> 30 == 2)
@@ -278,8 +240,7 @@ void JNP(VirtualMachine* vm) {
 }
 
 void JNN(VirtualMachine* vm) {
-    int bytes = 4;
-    int data = getData(vm, vm->registers[OP1], bytes);
+    int data = getData(vm, vm->registers[OP1]);
 
     unsigned int cc = vm->registers[CC];
     if (cc >> 30 == 0 || cc >> 30 == 1)
@@ -288,11 +249,10 @@ void JNN(VirtualMachine* vm) {
 }
 
 void SYS(VirtualMachine* vm) {
-    int bytes = 4;
     int quantity =vm->registers[ECX] & 0xFFFF;
     int size = (vm->registers[ECX] >> 16) & 0xFFFF;
     int mode = vm->registers[EAX];
-    int call = getData(vm, vm->registers[OP1], bytes);
+    int call = getData(vm, vm->registers[OP1]);
     int value;
 
     if(call == 1) { // read
@@ -367,8 +327,7 @@ void STOP(VirtualMachine* vm) {
 }
 
 void NOT(VirtualMachine* vm) {
-    int bytes = 4;
-    int data = getData(vm, vm->registers[OP1], bytes);
-    setData(vm, vm->registers[OP1], ~data, bytes);
+    int data = getData(vm, vm->registers[OP1]);
+    setData(vm, vm->registers[OP1], ~data);
     updateCCRegisterHandler(vm, ~data);
 }
