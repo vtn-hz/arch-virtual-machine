@@ -16,6 +16,8 @@
 
 #include "files_parsing.h"
 
+#include "utils.h"
+
 VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
     VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
     
@@ -41,11 +43,11 @@ VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
     return virtualM;
 }
 
-void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeSegmentContent, char* constSegmentContent, char* paramSegmentContent, int paramsSize) { 
+void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsAmount) { 
     int reg[8] = {-1};
 
     if(sizes[0] > 0)
-       setParamContentInMemory(virtualM, paramSegmentContent, sizes[0], paramsSize);
+       setParamContentInMemory(virtualM, paramSegmentContent, sizes[0], paramsAmount);
 
     createSegmentTable(&virtualM->segment_table);
     initSegmentTable(&virtualM->segment_table, sizes, reg); 
@@ -59,24 +61,37 @@ void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeS
     setMemoryContent(virtualM, codeSegmentContent, sizes[2]);
 }
 
-void setParamContentInMemory(VirtualMachine* virtualM, char* paramsContent, int paramSegmentSize, int paramsSize) {
-    int pointers[paramsSize];
+void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int paramSegmentSize, int paramsAmount) {
+    int pointers[paramsAmount];
     int previousSize = 0;
     int i;
     char* cad;
+    char* psContent = (char*) malloc(paramSegmentSize);
 
-    for( i = 0; i < paramsSize; i++){
-        pointers[i] = previousSize;
-        previousSize+=strlen(&paramsContent[previousSize]) + 1; //+1 for the null terminator
+    for( i = 0; i < paramsAmount; i++){ //cálculo de los punteros
+        pointers[i] = (0x0000 << 16) | previousSize;
+        previousSize+=strlen(paramsContent[i]) + 1; //+1 for the null terminator
     }
 
-    for( i = 0; i<paramsSize; i++){
+    int pos = paramsAmount;
+    for( i = 0; i < paramsAmount; i++){ //paso los punteros a string (tal vez es innecesario, puede verse)
         cad = intToString(pointers[i]);
-        strcat(paramsContent, cad);
-        free(cad);
+        paramsContent[pos] = cad;
+        pos++;
     }
 
-    setMemoryContent(virtualM, paramsContent, paramSegmentSize);
+    int offset = 0;
+    for (i = 0; i < paramsAmount; i++) { //es paramsamount porque es la cantidad de strings
+        strcpy(psContent + offset, paramsContent[i]);
+        offset += strlen(paramsContent[i]) + 1; // +1 por el '\0'
+    }
+
+    for (int i = paramsAmount; i < pos; i++) //vacio la memoria que utilicé para los punteros
+        free(paramsContent[i]);
+
+    setMemoryContent(virtualM, psContent, paramSegmentSize);
+
+    free(psContent);
 }
     
 void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]) {
