@@ -7,52 +7,43 @@
 
 #include "instruction_printer.h"
 
+#include "constant_printer.h"
+
 #include "segment_table.h"
 
 #include "virtual_machine.h"
 
 #include "error_handler.h"
 
-void printVirtualMachineState(VirtualMachine*);
-void rawInstructionPrint(VirtualMachine*);
+void virtualMachinePrintCodeSegment(VirtualMachine* vm);
+void virtualMachinePrintConstantSegment(VirtualMachine* vm);
 
 void virtualMachinePrint(VirtualMachine* vm) {
+    virtualMachinePrintConstantSegment(vm);
+    virtualMachinePrintCodeSegment(vm);
+}
+
+void virtualMachinePrintCodeSegment(VirtualMachine* vm) {
+    int entryPoint = vm->registers[IP];
+    vm->registers[IP] = vm->registers[CS];
+    
     while (!isSegmentCodeEnded(vm)) {
         prepareInstruction(vm);
         printVirtualMachineState(vm);
         advanceInstructionPointer(vm);
     }
 
-    vm->registers[IP] = vm->registers[CS];
+    vm->registers[IP] = entryPoint;
 }
 
-void printVirtualMachineState(VirtualMachine* vm) {
-    rawInstructionPrint(vm);
-    printf(" | ");
-    printInstruction(vm);
-    printf("\n");
-}
 
-void rawInstructionPrint(VirtualMachine* vm) {
-    int marginLeft = 8;
-    int opaSize = extractOperationType(vm->registers[OP1]);
-    int opbSize = extractOperationType(vm->registers[OP2]);
-    int opcSize = 1;
+void virtualMachinePrintConstantSegment(VirtualMachine* vm) {
+    int klogicPointer = vm->registers[KS];
+    int kfisicPointer;
 
-    if (opaSize < 0 || opaSize > 3) 
-        error_handler.invalidOperand(opaSize);
-
-    if (opbSize < 0 || opbSize > 3) 
-        error_handler.invalidOperand(opbSize);
-
-    int totalSize = opcSize + opaSize + opbSize;
-    int fisicIp = transformLogicalAddress(vm->segment_table, vm->registers[IP]);
-
-    printf("[%04X]", fisicIp);
-    for(int i=fisicIp; i < fisicIp + totalSize ; i++) 
-        printf(" %02X", vm->memory[i]);
-    
-    int bytesRestantes = marginLeft - totalSize;
-    for(int i=0; i < bytesRestantes ; i++) 
-        printf("   ");    
+    while(!isSegmentConstantEnded(vm, klogicPointer)) {
+        prepareConstantPointer(vm, klogicPointer, &kfisicPointer);
+        printConstantItem(vm, kfisicPointer);
+        advanceConstantPointer(vm, &klogicPointer, kfisicPointer);
+    }
 }
