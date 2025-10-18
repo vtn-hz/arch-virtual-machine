@@ -17,8 +17,8 @@ void prepareMemoryAccessHandler(VirtualMachine* virtualM, int baseRegister, int 
     int logicMemoryAccess = virtualM->registers[baseRegister] + memoryOffset;
     int fisicMemoryAccess = transformLogicalAddress(segment_table, logicMemoryAccess);
 
-    if (virtualM->registers[DS] != (logicMemoryAccess & 0xFFFF0000)) 
-        error_handler.segmentationFault(logicMemoryAccess);
+    if (virtualM->registers[CS] == (logicMemoryAccess & 0xFFFF0000)) 
+        error_handler.buildError("Error: attempt to access code segment memory");
 
     if (!isLogicalAddressValid(segment_table, logicMemoryAccess + (bytes - 1))) 
         error_handler.segmentationFault(logicMemoryAccess);
