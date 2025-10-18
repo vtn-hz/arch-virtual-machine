@@ -38,10 +38,10 @@ void getParsed(char** codeSegmentContent, char** constSegmentContent, arguments*
 }
 
 void vmxVersionOne(FILE* file, char **codeSegmentContent, int sizes[]){
-    int codeSize;
+    char codeSize[3];
 
-    fread(&codeSize, sizeof(short int), 1, file); //code size
-    sizes[2] = codeSize; //could be replace with fread(&sizes[2], sizeof(short int), 1, file);
+    fread(codeSize, sizeof(char), 2, file); //code size
+    sizes[2] = (unsigned char)codeSize[0] << 8 | (unsigned char)codeSize[1];
 
     *codeSegmentContent = (char*) malloc(sizes[2]);
     fread(*codeSegmentContent, sizeof(char), sizes[2], file);
@@ -50,9 +50,11 @@ void vmxVersionOne(FILE* file, char **codeSegmentContent, int sizes[]){
 }
 
 void vmxVersionTwo(FILE* file, char **codeSegmentContent, char** constSegmentContent, int* entryPoint, int sizes[]){
-    
+    char temp[3];
+
     readSizes(file, sizes);
-    fread(&entryPoint, sizeof(short int), 1, file); 
+    fread(temp, sizeof(char), 2, file); 
+    *entryPoint = (unsigned char)temp[0] << 8 | (unsigned char)temp[1];
 
     *codeSegmentContent = (char*) malloc(sizes[2]);
     fread(*codeSegmentContent, sizeof(char), sizes[2], file);
@@ -64,14 +66,20 @@ void vmxVersionTwo(FILE* file, char **codeSegmentContent, char** constSegmentCon
 }
 
 void vmiVersionOne(FILE* file, char** fileContent, arguments* args, int regs[], int segs[]){
+    char temp[5];
 
-    fread(&args->memory_size, sizeof(short int), 1, file); //memory size
+    fread(temp, sizeof(char), 2, file); //memory size
+    args->memory_size = (unsigned char)temp[0] << 8 | (unsigned char)temp[1];
 
-    for(int i = 0; i < 32; i++)
-        fread(&regs[i], sizeof(int), 1, file); //i do this here 'cause of the big endian issue
+    for(int i = 0; i < 32; i++){
+        fread(temp, sizeof(char), 4, file); //i do this here 'cause of the big endian issue
+        regs[i] =(unsigned char)temp[0] << 24 | (unsigned char)temp[1] << 16 | (unsigned char)temp[2] << 8 | (unsigned char)temp[3]; 
+    }
 
-    for(int i = 0; i < 8; i++)
-        fread(&segs[i], sizeof(int), 1, file);
+    for(int i = 0; i < 8; i++){
+        fread(temp, sizeof(char), 4, file); 
+        segs[i] = (unsigned char)temp[0] << 24 | (unsigned char)temp[1] << 16 | (unsigned char)temp[2] << 8 | (unsigned char)temp[3]; 
+    }
 
     *fileContent = (char*) malloc(args->memory_size*1024);
     fread(fileContent, sizeof(char), args->memory_size*1024, file); //we read the whole memory content here, not just the code segment   
@@ -79,17 +87,21 @@ void vmiVersionOne(FILE* file, char** fileContent, arguments* args, int regs[], 
 }
 
 void readSizes(FILE* file, int sizes[]) {
-    int temp;
-    fread(&temp, sizeof(short int), 1, file); //code
-    sizes[2] = temp; //&sizes[2]
-    fread(&temp, sizeof(short int), 1, file); //data
-    sizes[3] = temp;
-    fread(&temp, sizeof(short int), 1, file); //extra
-    sizes[4] = temp;
-    fread(&temp, sizeof(short int), 1, file); //stack
-    sizes[5] = temp;
-    fread(&temp, sizeof(short int), 1, file); //const
-    sizes[1] = temp;
+    char temp[3];
+    fread(temp, sizeof(char), 2, file); //code
+    sizes[2] = (unsigned char)temp[0] << 8 | (unsigned char)temp[1]; //&sizes[2]
+
+    fread(temp, sizeof(char), 2, file); //data
+    sizes[3] = (unsigned char)temp[0] << 8 | (unsigned char)temp[1];
+
+    fread(temp, sizeof(char), 2, file); //extra
+    sizes[4] = (unsigned char)temp[0] << 8 | (unsigned char)temp[1];
+
+    fread(temp, sizeof(char), 2, file); //stack
+    sizes[5] = (unsigned char)temp[0] << 8 | (unsigned char)temp[1];
+
+    fread(temp, sizeof(char), 2, file); //const
+    sizes[1] = (unsigned char)temp[0] << 8 | (unsigned char)temp[1];
 }
 
 //*sizeFile = (unsigned char)title[6] << 8 | (unsigned char)title[7];
