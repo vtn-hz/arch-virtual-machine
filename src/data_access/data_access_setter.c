@@ -12,27 +12,60 @@
 
 static p_setter_data availableDataSetter[4];
 
-void setData(VirtualMachine* vm, int operand, int value, int bytes) {
+void solveRegisterSectorSet(int *_register, int sector, int value);
+
+void setData(VirtualMachine* vm, int operand, int value) {
     int operandType = extractOperationType(operand);
 
     if (!(0 <= operandType && operandType <= 3))
         error_handler.invalidOperand(operand);   
     
-    availableDataSetter[operandType](vm, operand, value, bytes);
+    availableDataSetter[operandType](vm, operand, value);
 }   
 
+void setDataToRegister(VirtualMachine* vm, int operand, int value) {
+    int registerId = extractRegisterId(operand);
+    int sector = extractOperationSector(operand);
 
-void setDataToRegister(VirtualMachine* vm, int operand, int value, int bytes) {
-    vm->registers[extractOperationValue(operand)] = value;
+    solveRegisterSectorSet(vm->registers + registerId, sector, value);
 }
 
-void setDataToInmediato(VirtualMachine* vm, int operand, int value, int bytes) {
+void solveRegisterSectorSet(int *_register, int sector, int value) {
+    int originalRegisterValue = *_register;
+    
+    switch (sector) {
+        case 0b00: 
+            originalRegisterValue = 0; 
+            break;
+        case 0b01: 
+            originalRegisterValue &= 0xFFFFFF00;
+            value = applyMask(value, 0x000000FF, 0);
+            break;
+        case 0b10: 
+            originalRegisterValue &= 0xFFFF00FF;
+            value = applyMask(value, 0x0000FF, -8);
+            break;
+        case 0b11: 
+            originalRegisterValue &= 0xFFFF0000;
+            value = applyMask(value, 0x0000FFFF, 0);
+            break;
+        default:
+            error_handler.buildError("Error: invalid sector in register data getter");
+        
+    }
+
+    *_register = originalRegisterValue | value;
+}
+
+void setDataToInmediato(VirtualMachine* vm, int operand, int value) {
     error_handler.buildError("Error: no se puede asignar a un inmediato");
 }
 
-void setDataToMemory(VirtualMachine* vm, int operand, int value, int bytes) {
+void setDataToMemory(VirtualMachine* vm, int operand, int value) {
     int baseRegister = extractOperationBaseRegister(operand);
     int memoryOffset = extractOperationValue(operand);
+
+    int bytes = DEFAULT_ACCESS_SIZE - extractOperationCellSize(operand);
 
     prepareSetMemoryAccess(vm, baseRegister, memoryOffset, value, bytes);
     commitSetMemoryAccess(vm);
@@ -54,7 +87,7 @@ void commitSetMemoryAccess(VirtualMachine* vm) {
     }
 }
 
-void setDataToEmpty(VirtualMachine* vm, int operand, int value, int bytes) {
+void setDataToEmpty(VirtualMachine* vm, int operand, int value) {
     error_handler.emptyOperand();
 }
 

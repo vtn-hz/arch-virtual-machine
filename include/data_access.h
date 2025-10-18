@@ -3,16 +3,18 @@
 
 typedef struct VirtualMachine VirtualMachine;
 
-int  getData(VirtualMachine*, int operand, int bytes);
+#define DEFAULT_ACCESS_SIZE 4
+
+int  getData(VirtualMachine*, int operand);
 void prepareGetMemoryAccess(VirtualMachine*, int baseRegister, int memoryOffset, int bytes);
 int  commitGetMemoryAccess(VirtualMachine*);
 
-void setData(VirtualMachine*, int operand, int value, int bytes);
+void setData(VirtualMachine*, int operand, int value);
 void prepareSetMemoryAccess(VirtualMachine*, int baseRegister, int memoryOffset, int value, int bytes);
 void commitSetMemoryAccess(VirtualMachine*);
 
-typedef int (*p_getter_data)(VirtualMachine*, int operand, int bytes);
-typedef void (*p_setter_data)(VirtualMachine*, int operand, int value, int bytes);
+typedef int (*p_getter_data)(VirtualMachine*, int operand);
+typedef void (*p_setter_data)(VirtualMachine*, int operand, int value);
 
 void initializeGetters();
 void initializeSetters();
