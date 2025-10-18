@@ -19,6 +19,9 @@ typedef struct VirtualMachine {
     char mode;
 } VirtualMachine;
 
+
+VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]);
+
 /**
  * Instantiates the virtual machine and allocates 2^10 * 16 bytes in memory (*memory).
  * Creates the corresponding segments.
