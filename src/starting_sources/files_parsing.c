@@ -10,7 +10,7 @@
 
 #include "virtual_machine.h"
 
-void getParsed(char** codeSegmentContent, char** constSegmentContent, arguments* args, int sizes[], int* entryPoint) {    
+void getParsed(char** codeSegmentContent, char** constSegmentContent, arguments* args, int sizes[], int* entryPoint, int regs[], int segs[]) {    
     FILE* file;
     int version;
     
@@ -32,7 +32,7 @@ void getParsed(char** codeSegmentContent, char** constSegmentContent, arguments*
             vmxVersionOne(file, codeSegmentContent, sizes);   
     
     else
-        //vmiVersionOne(file, codeSegmentContent, args, sizes);
+        //vmiVersionOne(file, codeSegmentContent, args, regs, segs);
     
     fclose(file);
 }
@@ -49,32 +49,32 @@ void vmxVersionOne(FILE* file, char **codeSegmentContent, int sizes[]){
     sizes[3] = DEFAULT_MEMORY_SIZE - sizes[2]; //rest of memory is data segment
 }
 
-void vmxVersionTwo(FILE* file,char **codeSegmentContent, char** constSegmentContent, int* entryPoint, int sizes[]){
+void vmxVersionTwo(FILE* file, char **codeSegmentContent, char** constSegmentContent, int* entryPoint, int sizes[]){
     
     readSizes(file, sizes);
-    fread(entryPoint, sizeof(short int), 1, file); 
+    fread(&entryPoint, sizeof(short int), 1, file); 
+
     *codeSegmentContent = (char*) malloc(sizes[2]);
     fread(*codeSegmentContent, sizeof(char), sizes[2], file);
+    
     if(sizes[1]){
         *constSegmentContent = (char*) malloc(sizes[1]);
         fread(*constSegmentContent, sizeof(char), sizes[1], file);    
     }
-    fread( &entryPoint, sizeof(short int), 1, file);
 }
 
-void vmiVersionOne(FILE* file, char** codeSegmentContent, arguments* args, int sizes[]){
-    int* registers = (int*) malloc(32 * sizeof(int)); 
-    int* segment_table = (int*) malloc(8 * sizeof(int)); 
+void vmiVersionOne(FILE* file, char** fileContent, arguments* args, int regs[], int segs[]){
 
     fread(&args->memory_size, sizeof(short int), 1, file); //memory size
 
     for(int i = 0; i < 32; i++)
-        fread(&registers[i], sizeof(int), 1, file); 
+        fread(&regs[i], sizeof(int), 1, file); //i do this here 'cause of the big endian issue
 
     for(int i = 0; i < 8; i++)
-        fread(&segment_table[i], sizeof(int), 1, file);
+        fread(&segs[i], sizeof(int), 1, file);
 
-    fread(codeSegmentContent, sizeof(char), args->memory_size, file); //we read the whole memory content here, not just the code segment   
+    *fileContent = (char*) malloc(args->memory_size*1024);
+    fread(fileContent, sizeof(char), args->memory_size*1024, file); //we read the whole memory content here, not just the code segment   
 
 }
 
@@ -99,7 +99,7 @@ void readIdentifier(FILE* file, int* version) { // assumes file exists
 
     fread(title, sizeof(char), 6, file);
 
-    if(strncmp(title, "VMX25", 5)!=0 || strncmp(title, "VMI25",5)!=0)
+    if(strncmp(title, "VMX25", 5)!=0 && strncmp(title, "VMI25",5)!=0)
         error_handler.invalidHeader();
 
     *version = (unsigned char)title[5] - '0';
