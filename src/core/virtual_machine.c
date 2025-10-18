@@ -13,11 +13,9 @@
 
 VirtualMachine* createVm(int codeSegmentSize,char* fileContent) {
     VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
-    virtualM->memory = (unsigned char*) malloc(MEMORY_SIZE);
+    virtualM->memory = (unsigned char*) malloc(DEFAULT_MEMORY_SIZE); // this might be done in the entity that fills the memory
 
-    initSegmentTable(&virtualM->segment_table);
-    addSegment(&virtualM->segment_table, codeSegmentSize);
-    addSegment(&virtualM->segment_table, memorySizeLeft(virtualM->segment_table)); // assumes only two segments
+    createSegmentTable(&virtualM->segment_table);
 
     vmSetUp(virtualM, 0, 1);
     setMemoryContent(virtualM, fileContent, codeSegmentSize);
@@ -27,16 +25,6 @@ VirtualMachine* createVm(int codeSegmentSize,char* fileContent) {
 void vmSetUp(VirtualMachine* virtualM, int csSegment, int dsSegment) {
     int* registers = virtualM->registers;
 
-    registers[CS] = csSegment << 16; 
-    registers[DS] = dsSegment << 16;
-
-    registers[28] = -1;
-    registers[29] = -1;
-    registers[30] = -1;
-    registers[31] = -1;
-
-    registers[IP] = registers[CS];
-
     virtualM->mode = GO_MODE; // if it was restored may be initilized with DEBUG_MODE
 
     initializeGetters();
@@ -45,7 +33,7 @@ void vmSetUp(VirtualMachine* virtualM, int csSegment, int dsSegment) {
 }
 
 void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSize) {
-    if (contentSize > MEMORY_SIZE) {
+    if (contentSize > DEFAULT_MEMORY_SIZE) {
         error_handler.buildError("Error: el tamaño del contenido {%d} excede la memoria disponible", contentSize);
     }
     int address = transformLogicalAddress(virtualM->segment_table, virtualM->registers[CS]);
