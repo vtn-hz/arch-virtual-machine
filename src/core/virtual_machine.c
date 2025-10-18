@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "virtual_machine.h"
 
@@ -41,8 +42,8 @@ VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
 void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeSegmentContent, char* constSegmentContent, char* paramSegmentContent, int paramsSize) { 
     int reg[8] = {-1};
 
-    //if(sizes[0] > 0)
-    //    setParamsInMemory(virtualM, paramSegmentContent, sizes[0], paramsSize);
+    if(sizes[0] > 0)
+       setParamContentInMemory(virtualM, paramSegmentContent, sizes[0], paramsSize);
 
     createSegmentTable(&virtualM->segment_table);
     initSegmentTable(&virtualM->segment_table, sizes, reg); 
@@ -56,15 +57,24 @@ void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeS
     setMemoryContent(virtualM, codeSegmentContent, sizes[2]);
 }
 
-void setParamsInMemory(VirtualMachine* virtualM, char* paramsContent, int paramSegmentSize, int paramsSize) {
+void setParamContentInMemory(VirtualMachine* virtualM, char* paramsContent, int paramSegmentSize, int paramsSize) {
     int pointers[paramsSize];
     int previousSize = 0;
+    int i;
+    char* cad;
 
-    for(int i = 0; i < paramsSize; i++){
+    for( i = 0; i < paramsSize; i++){
         pointers[i] = previousSize;
         previousSize+=strlen(&paramsContent[previousSize]) + 1; //+1 for the null terminator
     }
 
+    for( i = 0; i<paramsSize; i++){
+        cad = intToString(pointers[i]);
+        strcat(paramsContent, cad);
+        free(cad);
+    }
+
+    setMemoryContent(virtualM, paramsContent, paramSegmentSize);
 }
     
 void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]) {

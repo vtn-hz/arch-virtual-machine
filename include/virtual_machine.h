@@ -27,6 +27,14 @@ typedef struct VirtualMachine {
  */
 void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeSegmentContent, char* constSegmentContent, char* paramSegmentContent, int paramsSize);
 
+/**
+ * Sets the parameters content in memory, adding at the end the pointers to each parameter.
+ */
+void setParamContentInMemory(VirtualMachine* virtualM, char* paramsContent, int paramSegmentSize, int paramsSize);
+
+/**
+ * Builds the virtual machine from the provided registers and segments of a vmi file.
+ */
 void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]);
 
 /**
