@@ -17,7 +17,7 @@ void initSegmentTable(DST* table, int sizes[], int reg[]) { //could be called by
     for(int i = 0; i < DST_MAX; i++)
         if(sizes[i] > 0){
             addSegment(table, sizes[i]);
-            reg[i] = (table->counter -1) << 16; // segment number in high bytes. again, order: param, const, code, data, extra, stack (same as to be saved in memory)
+            reg[i] = ((table->counter) -1 ) << 16; // segment number in high bytes. again, order: param, const, code, data, extra, stack (same as to be saved in memory)
         }
 }
 
