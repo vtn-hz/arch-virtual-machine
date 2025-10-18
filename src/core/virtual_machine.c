@@ -22,7 +22,7 @@ VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
     VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
     
     char* codeSegmentContent;
-    int entryPoint;
+    int entryPoint = 0;
     char* constSegmentContent;
     int regs[32]; //only for the vmi, kind of wasteful but easier this way
     int segs[8];
