@@ -17,6 +17,8 @@ int main(int argc, char** argv) {
     int sizes[6] = {0}; //order: param, const, code, data, extra, stack (same as to be saved in memory)
 
     getArguments(argc, argv, &args, sizes); // param segment size
+    
+    VirtualMachine* virtualM = initializeVM_fromFile(&args, sizes);
 
     /**
      printf("Archivo .vmx: %s\n", args.currentVmx);
@@ -40,7 +42,6 @@ int main(int argc, char** argv) {
      printf("Memory Size: %d KB\n", args.memory_size); 
      */
 
-    //VirtualMachine* virtualM = createVm(sizes, args, fileContent);
 
     /*if (args.dissasembler) 
         virtualMachinePrint(virtualM);
