@@ -115,7 +115,15 @@ void SHR(VirtualMachine* vm) {
     int sar = dataOp1 >> dataOp2;
     int signBit = 0xFFFFFFFF;
     if (dataOp2 > 0) {
-        signBit = 0x80000000 >> (32 *8);
+        signBit = 0x80000000 ; 
+        /**
+         * que deberia hacer ahora que sabemos como funcionan la memoria en pedacitos?
+         * deberiamos hacer a partir de lo que cree que leyo el usuario de la maquina virtual?
+         * si es asi, exactamnete desde donde deberiamos comenzar a leer? 
+         * porque si era un registro op2 se hace una cosa o sino otra?
+         * 
+         * antes: signBit = 0x80000000 >> (32 - bytes*8);
+         */
         signBit = ~(signBit >> (dataOp2 - 1));
     }
 
