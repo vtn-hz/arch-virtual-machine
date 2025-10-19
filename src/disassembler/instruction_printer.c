@@ -73,7 +73,7 @@ void printOperand(int operand, int opCode) {
 }
 
 void printOperandRegister(int operand) {
-    int registerCode = extractOperationValue(operand);
+    int registerCode = extractRegisterId(operand);
 
     if (registerCode < 0 || registerCode > 31)
         error_handler.buildError("Error: {%x} es registro invalido ", registerCode);
@@ -81,7 +81,15 @@ void printOperandRegister(int operand) {
     if (REGISTERS_STR[registerCode] == NULL)
         error_handler.buildError("Error: {%x} es registro invalido ", registerCode);
 
-    printf("%10s", REGISTERS_STR[registerCode]);
+    char *registerStr;
+    if ( registerCode >= 10 && registerCode <= 15 ) {
+        int sector = extractOperationSector(operand);
+        registerStr = (char*) REGISTERS_STR_SECTOR[registerCode - 10][sector];
+    }else 
+        registerStr = (char*) REGISTERS_STR[registerCode];
+    
+
+    printf("%10s", registerStr);
 }
 
 void printOperandInmmediate(int operand, int opCode) {
@@ -96,6 +104,7 @@ void printOperandInmmediate(int operand, int opCode) {
 }
 
 void printOperandMemory(int operand) {
+    int tagId        = extractOperationCellSize(operand);
     int registerCode = extractOperationBaseRegister(operand);
     int offset       = extractOperationValue(operand); 
 
@@ -105,13 +114,15 @@ void printOperandMemory(int operand) {
     if (REGISTERS_STR[registerCode] == NULL)
         error_handler.buildError("Error: {%x} registro es invalido ", registerCode);
 
+    char sizeTags[4] = {'', 'w', NULL, 'b'};
     char buffer[64];
+
     if (offset != 0) {
         char sign = offset > 0 ? '+' : '-';
         offset = offset > 0 ? offset : -offset;
-        sprintf(buffer, "[%s %c %d]", REGISTERS_STR[registerCode], sign, offset);
+        sprintf(buffer, "%c[%s %c %d]", sizeTags[tagId], REGISTERS_STR[registerCode], sign, offset);
     } else
-        sprintf(buffer, "[%s]", REGISTERS_STR[registerCode]);
+        sprintf(buffer, "%c[%s]", sizeTags[tagId], REGISTERS_STR[registerCode]);
 
     printf("%10s", buffer);
 }
