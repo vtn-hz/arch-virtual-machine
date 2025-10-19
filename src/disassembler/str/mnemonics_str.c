@@ -13,10 +13,10 @@ const char* MNEMONICS_STR[32] = {
     "NOT",  // 0x08
     NULL,   // 0x09
     NULL,   // 0x0A
-    NULL,   // 0x0B
-    NULL,   // 0x0C
-    NULL,   // 0x0D
-    NULL,   // 0x0E
+    "PUSH", // 0x0B
+    "POP",  // 0x0C
+    "CALL", // 0x0D
+    "RET",  // 0x0E
     "STOP", // 0x0F
     "MOV",  // 0x10
     "ADD",  // 0x11
