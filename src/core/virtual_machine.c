@@ -18,9 +18,8 @@
 
 #include "utils.h"
 
-VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
+VirtualMachine* buildVm(arguments* args, int sizes[]) {
     // name is confuse, maybe sizes couuld be inside args? (initializer package)  mari: i like it, should change it everywhere tho
-    // what about initializeVM_fromFile to buildVm( args ); ?   mari: if we change vmi's name i agree to change this one too  
     VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
     
     char* codeSegmentContent;
@@ -31,13 +30,12 @@ VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
     
     getParsed(&codeSegmentContent, &constSegmentContent, args, sizes, &entryPoint, regs, segs);
 
-    virtualM->memory = (unsigned char*) malloc(args->memory_size * 1024);
-
     if(args->currentVmx){
-        createVm(virtualM, sizes, entryPoint, codeSegmentContent, constSegmentContent, args->params, args->paramsAmount);
+        createVm(virtualM, sizes, args->memory_size, entryPoint, codeSegmentContent, constSegmentContent, args->params, args->paramsAmount);
+        virtualM->memory = (unsigned char*) malloc(args->memory_size * 1024);
     }
     else
-        buildVm(virtualM, args, codeSegmentContent, regs, segs); // change name to restoreVm? mari: like it too, much more precise
+        restoreVm(virtualM, args, codeSegmentContent, regs, segs); // change name to restoreVm? mari: like it too, much more precise
 
     free(codeSegmentContent);
     free(constSegmentContent); //is it so bad if we do this here? not really, is a local variabe after all
@@ -45,13 +43,13 @@ VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
     return virtualM;
 }
 
-void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsAmount) { 
+void createVm(VirtualMachine* virtualM, int sizes[], int memorySize, int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsAmount) { 
     int reg[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     if(sizes[0] > 0)
        setParamContentInMemory(virtualM, paramSegmentContent, sizes[0], paramsAmount);
 
-    createSegmentTable(&virtualM->segment_table);
+    createSegmentTable(&virtualM->segment_table, memorySize);
     initSegmentTable(&virtualM->segment_table, sizes, reg); 
     setSTRegisters(virtualM, reg, entryPoint, sizes[0] - (paramsAmount*4)); //i send the size of the params minus the size of the pointers
 
@@ -96,9 +94,9 @@ void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int
     free(psContent);
 }
     
-void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]) {
+void restoreVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]) {
 
-    createSegmentTable(&virtualM->segment_table);
+    createSegmentTable(&virtualM->segment_table, args->memory_size); //careful here, memory size sent is the default one 'cause we dont have it in vmi files, we calculate it later
 
     vmSetUp(virtualM);
 
@@ -109,7 +107,10 @@ void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int r
         virtualM->segment_table.descriptors[i].base = segs[i] >> 16;
         virtualM->segment_table.descriptors[i].size = segs[i] & 0x0000FFFF;
     }
-        
+
+    args->memory_size = (virtualM->segment_table.descriptors[DST_MAX -1].base + virtualM->segment_table.descriptors[DST_MAX -1].size)/1024; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
+    virtualM->memory = (unsigned char*) malloc(args->memory_size * 1024);
+
     setMemoryContent(virtualM, fileContent, args->memory_size * 1024);
 }
 

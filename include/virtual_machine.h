@@ -22,7 +22,7 @@ typedef struct VirtualMachine {
 } VirtualMachine;
 
 
-VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]);
+VirtualMachine* buildVm(arguments* args, int sizes[]);
 
 /**
  * Instantiates the virtual machine and allocates 2^10 * 16 bytes in memory (*memory).
@@ -40,7 +40,7 @@ void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int
 /**
  * Builds the virtual machine from the provided registers and segments of a vmi file.
  */
-void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]);
+void restoreVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]);
 
 /**
  * Initializes the segment table registers, IP and SS.
