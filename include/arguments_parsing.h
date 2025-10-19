@@ -1,7 +1,7 @@
 #ifndef ARGUMENTS_PARSING_H
 #define ARGUMENTS_PARSING_H
 
-#define MAX_PARAMS 20
+#define MAX_PARAMS 200
 
 typedef struct arguments{
     char* currentVmx;

@@ -100,4 +100,12 @@ int extractOperationValue(int operand);
  */
 int extractOperationBaseRegister(int operand);
 
+/**
+ * Converts an integer to its string representation
+ * 
+ * @param number The integer to convert
+ * @return A pointer to the string representation of the integer
+ */
+char* intToString(int number);
+
 #endif

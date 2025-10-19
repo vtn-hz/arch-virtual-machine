@@ -7,6 +7,8 @@
 
 #include "common_registers.h"
 
+#include "arguments_parsing.h"
+
 #define DEFAULT_MEMORY_SIZE 16384 
 
 typedef struct VirtualMachine {
@@ -19,18 +21,33 @@ typedef struct VirtualMachine {
     char mode;
 } VirtualMachine;
 
+
+VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]);
+
 /**
  * Instantiates the virtual machine and allocates 2^10 * 16 bytes in memory (*memory).
  * Creates the corresponding segments.
  * 
  * @return A pointer to the newly created VirtualMachine.
  */
-VirtualMachine* createVm(int codeSegmentSize, char* fileContent);
+void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsSize);
 
 /**
- * Initializes the registers CS, DS, and IP.
+ * Sets the parameters content in memory, adding at the end the pointers to each parameter.
  */
-void vmSetUp(VirtualMachine*, int csSegment, int dsSegment);
+void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int paramSegmentSize, int paramsSize);
+
+/**
+ * Builds the virtual machine from the provided registers and segments of a vmi file.
+ */
+void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]);
+
+/**
+ * Initializes the segment table registers and IP.
+ */
+void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint);
+
+void vmSetUp(VirtualMachine*);
 
 void setMemoryContent(VirtualMachine*, char*, int);
 

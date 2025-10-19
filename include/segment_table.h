@@ -14,7 +14,7 @@ typedef struct {
 
 void createSegmentTable(DST* table);
 
-void initSegmentTable(DST* table, int sizes[], int registers[]);
+void initSegmentTable(DST* table, int sizes[], int reg[]);
 
 /**
  * Converts a logical address to a physical address using
