@@ -114,15 +114,15 @@ void printOperandMemory(int operand) {
     if (REGISTERS_STR[registerCode] == NULL)
         error_handler.buildError("Error: {%x} registro es invalido ", registerCode);
 
-    char sizeTags[4] = {'', 'w', NULL, 'b'};
+    const char* sizeTags[4] = {"", "w", NULL, "b"};
     char buffer[64];
 
     if (offset != 0) {
         char sign = offset > 0 ? '+' : '-';
         offset = offset > 0 ? offset : -offset;
-        sprintf(buffer, "%c[%s %c %d]", sizeTags[tagId], REGISTERS_STR[registerCode], sign, offset);
+        sprintf(buffer, "%s[%s %c %d]", sizeTags[tagId], REGISTERS_STR[registerCode], sign, offset);
     } else
-        sprintf(buffer, "%c[%s]", sizeTags[tagId], REGISTERS_STR[registerCode]);
+        sprintf(buffer, "%s[%s]", sizeTags[tagId], REGISTERS_STR[registerCode]);
 
     printf("%10s", buffer);
 }
