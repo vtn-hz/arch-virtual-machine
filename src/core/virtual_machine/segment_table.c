@@ -15,7 +15,8 @@ void createSegmentTable(DST* table) {
 void initSegmentTable(DST* table, int sizes[], int reg[]) { //could be called by createVm or the function that extracts data from files
 
     for(int i = 0; i < DST_MAX; i++)
-        if(sizes[i] > 0){
+        if(sizes[i] > 0) {
+            /* good job here, i think it works */ 
             addSegment(table, sizes[i]);
             reg[i] = ((table->counter) -1 ) << 16; // segment number in high bytes. again, order: param, const, code, data, extra, stack (same as to be saved in memory)
         }
@@ -63,6 +64,7 @@ void addSegment(DST* table, unsigned short size) {
         base = lastSegment->base + lastSegment->size;
     }
 
+    // here maybe we have to add available_memory to DST struct to check if we have enough memory (now is variable)
     if (base + size > DEFAULT_MEMORY_SIZE) 
         error_handler.buildError("Error: {base: %d, size: %d} memoria solicitada no disponible", base, size); // not enough memory   
 
@@ -72,6 +74,7 @@ void addSegment(DST* table, unsigned short size) {
 }
 
 int memorySizeLeft(DST table) {
+    // available_memory in struct is required
     int usedMemory = table.descriptors[table.counter-1].base + table.descriptors[table.counter-1].size;
     return DEFAULT_MEMORY_SIZE - usedMemory;
 }

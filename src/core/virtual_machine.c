@@ -19,6 +19,8 @@
 #include "utils.h"
 
 VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
+    // name is confuse, maybe sizes couuld be inside args? (initializer package) 
+    // what about initializeVM_fromFile to buildVm( args ); ?  
     VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
     
     char* codeSegmentContent;
@@ -35,16 +37,16 @@ VirtualMachine* initializeVM_fromFile(arguments* args, int sizes[]) {
         createVm(virtualM, sizes, entryPoint, codeSegmentContent, constSegmentContent, args->params, args->paramsAmount);
     }
     else
-        buildVm(virtualM, args, codeSegmentContent, regs, segs);
+        buildVm(virtualM, args, codeSegmentContent, regs, segs); // change name to restoreVm?
 
     free(codeSegmentContent);
-    free(constSegmentContent); //is it so bad if we do this here?
+    free(constSegmentContent); //is it so bad if we do this here? not really, is a local variabe after all
 
     return virtualM;
 }
 
 void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsAmount) { 
-    int reg[8] = {-1};
+    int reg[8] = {-1}; // this only assign value to first position, rest are 0
 
     if(sizes[0] > 0)
        setParamContentInMemory(virtualM, paramSegmentContent, sizes[0], paramsAmount);
@@ -69,13 +71,13 @@ void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int
     char* psContent = (char*) malloc(paramSegmentSize);
 
     for( i = 0; i < paramsAmount; i++){ //cálculo de los punteros
-        pointers[i] = (0x0000 << 16) | previousSize;
+        pointers[i] = (0x0000 << 16) | previousSize;// whats mean the 0x0000 << 16 ?
         previousSize+=strlen(paramsContent[i]) + 1; //+1 for the null terminator
     }
 
     int pos = paramsAmount;
     for( i = 0; i < paramsAmount; i++){ //paso los punteros a string (tal vez es innecesario, puede verse)
-        cad = intToString(pointers[i]);
+        cad = intToString(pointers[i]); // change name to intToBytes or something like parseBigEldian ?
         paramsContent[pos] = cad;
         pos++;
     }
@@ -114,6 +116,7 @@ void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int r
 void vmSetUp(VirtualMachine* virtualM) {
 
     virtualM->mode = GO_MODE; // if it was restored may be initilized with DEBUG_MODE
+                              // you could send it as parameter if needed
 
     initializeGetters();
     initializeSetters();
@@ -131,6 +134,8 @@ void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint) {
     registers[SS] = reg[5];
 
     registers[IP] = (registers[CS] & 0xFFFF0000) | (entrypoint & 0x0000FFFF);
+    // here we have to set SP to the bottom of the stack segment
+    // something like: registers[SP] = (registers[SS] & (virtualM->segment_table[ registers[SS] >> 16 ]).size)
 }
 
 void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSize) {
