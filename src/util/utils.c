@@ -31,7 +31,7 @@ int extractRegisterId(int operand) {
 }
 
 int extractOperationCellSize(int operand) {
-    return applyMaskAfter(operand, 0x3, 32);
+    return applyMaskAfter(operand, 0x3, 21);
 }
 
 int extractOperationType(int operand) {
@@ -44,7 +44,7 @@ int extractOperationValue(int operand) {
 }
 
 int extractOperationBaseRegister(int operand) {
-    return applyMask(operand, 0x00FF0000, 16);
+    return applyMask(operand, 0x001F0000, 16);
 }
 
 char* intToString(int number){
