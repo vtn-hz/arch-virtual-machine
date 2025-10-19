@@ -1,20 +1,29 @@
-#ifndef READ_FUNCTIONS_H
-#define READ_FUNCTIONS_H
+#ifndef SYSTEM_CALLS_H
+#define SYSTEM_CALLS_H
 
-typedef void (*writeFunc)(int);
+typedef struct VirtualMachine VirtualMachine;
 
-int readDecimal();
-int readChar();
-int readOctal();
-int readHex();
-int readBinary();
+#define BUFFER_SIZE 256
 
-void writeDecimal(int value);
-void writeChar(int value);
-void writeOctal(int value);
-void writeHex(int value);
-void writeBinary(int value);
+void dispatchSystemCall( VirtualMachine* );
 
-void prepareDisplays(int, writeFunc*, int*);
+void systemCallRead( VirtualMachine* );
+
+void systemCallWrite( VirtualMachine* );
+
+void systemCallStringRead( VirtualMachine* );
+
+void systemCallStringWrite( VirtualMachine* );
+
+#ifdef _WIN32
+    #define CLEAR_COMMAND "cls"
+#else   
+    #define CLEAR_COMMAND "clear"
+#endif
+
+void systemCallClrScreen( VirtualMachine* );
+
+void systemCallBreakpoint( VirtualMachine* );
+
 
 #endif

@@ -257,77 +257,7 @@ void JNN(VirtualMachine* vm) {
 }
 
 void SYS(VirtualMachine* vm) {
-    int quantity =vm->registers[ECX] & 0xFFFF;
-    int size = (vm->registers[ECX] >> 16) & 0xFFFF;
-    int mode = vm->registers[EAX];
-    int call = getData(vm, vm->registers[OP1]);
-    int value;
-
-    if(call == 1) { // read
-        int (*reader)() = NULL;
-
-        if (size != 1 && size != 2 && size != 4) {
-            error_handler.buildError("Error: tamaño de dato inválido");
-            return;
-        }
-
-        switch (mode) {
-            case 0x01: 
-                reader = readDecimal; 
-                break;
-            case 0x02: 
-                reader = readChar; 
-                break;
-            case 0x04: 
-                reader = readOctal; 
-                break;
-            case 0x08: 
-                reader = readHex; 
-                break;
-            case 0x10: 
-                reader = readBinary; 
-                break;
-            default:
-                error_handler.buildError("Error: modo de lectura invalido");
-                return;
-        }
-
-        for (int i = 0; i < quantity; i++) {
-            prepareMemoryAccessHandler(vm, EDX, i*size, size);
-
-            printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
-            value = reader();
-            
-            prepareMBRHandler(vm, value);
-            commitSetMemoryAccess(vm);
-        }
-    } else if(call == 2) { // write 
-        int count = 0;
-        writeFunc funcs[5], charfunc = writeChar;
-        prepareDisplays(mode, funcs, &count);
-
-        for(int i=0; i<quantity; i++) {
-            prepareGetMemoryAccess(vm, EDX, i*size, size);
-            value = commitGetMemoryAccess(vm);
-            
-            printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
-            for (int j = 0; j < count; j++) {
-                if (j > 0) printf(" ");
-
-                if (funcs[j] == charfunc)
-                    for (int k = size-1; k >= 0; k--)
-                        funcs[j](value >> k * 8 & 0xFF);
-                else
-                    funcs[j](value);
-            }
-            printf("\n");
-        }
-
-    }else if ( call == 0xF ) {
-        vm->mode = DEBUG_MODE;
-    } else {
-        error_handler.buildError("Error: operacion de sistema invalida");
-    }
+    dispatchSystemCall(vm);
 }
 
 void STOP(VirtualMachine* vm) {
