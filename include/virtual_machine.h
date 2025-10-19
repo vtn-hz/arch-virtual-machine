@@ -43,9 +43,9 @@ void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int
 void buildVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]);
 
 /**
- * Initializes the segment table registers and IP.
+ * Initializes the segment table registers, IP and SS.
  */
-void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint);
+void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint, int paramsSize);
 
 void vmSetUp(VirtualMachine*);
 
