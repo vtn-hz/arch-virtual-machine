@@ -4,12 +4,13 @@
 #include "error_handler.h"
 #include "virtual_machine.h"
 
-void createSegmentTable(DST* table) {
+void createSegmentTable(DST* table, int memorySize) {
     table->counter = 0;
     for (int i = 0; i < DST_MAX; i++) {
         table->descriptors[i].base = -1;
         table->descriptors[i].size = -1;
     }
+    table->available_memory = memorySize*1024; // in bytes
 }
 
 void initSegmentTable(DST* table, int sizes[], int reg[]) { //could be called by createVm or the function that extracts data from files
@@ -64,8 +65,8 @@ void addSegment(DST* table, unsigned short size) {
         base = lastSegment->base + lastSegment->size;
     }
 
-    // here maybe we have to add available_memory to DST struct to check if we have enough memory (now is variable)
-    if (base + size > DEFAULT_MEMORY_SIZE) 
+    // here maybe we have to add available_memory to DST struct to check if we have enough memory (now is variable) mari: like it, done
+    if (base + size > table->available_memory) 
         error_handler.buildError("Error: {base: %d, size: %d} memoria solicitada no disponible", base, size); // not enough memory   
 
     table->descriptors[table->counter].base = base;
@@ -76,5 +77,5 @@ void addSegment(DST* table, unsigned short size) {
 int memorySizeLeft(DST table) {
     // available_memory in struct is required
     int usedMemory = table.descriptors[table.counter-1].base + table.descriptors[table.counter-1].size;
-    return DEFAULT_MEMORY_SIZE - usedMemory;
+    return table.available_memory - usedMemory;
 }
