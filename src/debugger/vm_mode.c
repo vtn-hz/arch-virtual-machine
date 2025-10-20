@@ -3,6 +3,8 @@
 
 #include "virtual_machine.h"
 
+#include "vm_image.h"
+
 #include "vm_mode.h"
 
 int isDebugEnabled( void* params ) {
@@ -26,11 +28,11 @@ char askDebugAction() {
     return c;
 }
 
-void solveDebugAction(VirtualMachine* vm, char* imagePath, char action) {
+void solveDebugAction(VirtualMachine* vm, arguments args, char action) {
     vm->mode = action;
 
     switch(vm->mode) {
-        case DEBUG_MODE: /* generate image */ break;
+        case DEBUG_MODE: buildImage(vm, args); break;
  
         case QUIT_MODE: exit(EXIT_SUCCESS); break;
     }

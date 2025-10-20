@@ -21,11 +21,11 @@ void prepareInstruction(VirtualMachine*);
 void advanceInstructionPointer(VirtualMachine*);
 void executeInstruction(VirtualMachine*);
 
-void virtualMachineRun(VirtualMachine* virtualM) {
+void virtualMachineRun(VirtualMachine* virtualM, arguments args) {
     while (!isSegmentCodeEnded(virtualM)) {
 
-        if ( isDebugMode(virtualM, virtualM /*params*/) ) {
-            solveDebugAction(virtualM, "file.vmi", askDebugAction()); 
+        if ( isDebugMode(virtualM, args.params) ) {
+            solveDebugAction(virtualM, args, askDebugAction());
         }
       
         prepareInstruction(virtualM);

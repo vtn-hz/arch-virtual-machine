@@ -12,23 +12,19 @@
 
 #include "error_handler.h"
 
-char* arrToChars(int* intVec, int vecSize) {
-    char* charVec = (char*)malloc(vecSize * 4);
+void arrToChars(int* intVec, int vecSize, char* charVec) {
     for (int i = 0; i < vecSize; i++) {
         int value = intVec[i];
-        charVec[i * 4] = (value >> 24) & 0xFF;
+        charVec[i * 4]     = (value >> 24) & 0xFF;
         charVec[i * 4 + 1] = (value >> 16) & 0xFF;
-        charVec[i * 4 + 2] = (value >> 8) & 0xFF;
-        charVec[i * 4 + 3] = value & 0xFF;
+        charVec[i * 4 + 2] = (value >> 8)  & 0xFF;
+        charVec[i * 4 + 3] = value         & 0xFF;
     }
-    return charVec;
 }
 
-void buildImage(VirtualMachine* vm) {
-    // arguments
-    char* path = "vmi/testv2.vmi";
-    unsigned short size = 0xFFFF;
-    //
+void buildImage(VirtualMachine* vm, arguments args) {
+    char* path = args.currentVmi;
+    unsigned short size = args.memory_size;
 
     FILE* vmi = fopen(path, "wb");
 
@@ -48,25 +44,32 @@ void saveHead(FILE* vmi, unsigned short size) {
 }
 
 void saveReg(FILE* vmi, VirtualMachine* vm) {
-    char* printArr = arrToChars(vm->registers, 32);
+    char* printArr = (char*)malloc(32 * 4);
+    arrToChars(vm->registers, 32, printArr);
+
     fwrite(printArr, 1, 4*32, vmi);
+
+    free(printArr);
 }
 
 void saveTab(FILE* vmi, VirtualMachine* vm) {
     DST st = vm->segment_table;
-
+    
     int segments[8];
     for (int i = 0; i < 8; i++) // initialization
-        segments[i] = -1;
-
-    for (int i = 0; i < st.counter; i++) // ldh base
-        segments[i] = st.descriptors[i].base << 16;
-    for (int i = 0; i < st.counter; i++) // ldl size
-        segments[i] |= st.descriptors[i].size;
+    segments[i] = -1;
     
-    char* printArr = arrToChars(segments, 8);
-
+    for (int i = 0; i < st.counter; i++) // ldh base
+    segments[i] = st.descriptors[i].base << 16;
+    for (int i = 0; i < st.counter; i++) // ldl size
+    segments[i] |= st.descriptors[i].size;
+    
+    char * printArr = (char*)malloc(8 * 4);
+    arrToChars(segments, 8, printArr);
+    
     fwrite(printArr, 1, 4*8, vmi);
+
+    free(printArr);
 }
 
 void saveMem(FILE* vmi, VirtualMachine* vm, unsigned short size) {
