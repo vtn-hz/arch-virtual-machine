@@ -31,14 +31,16 @@ VirtualMachine* buildVm(arguments* args, int sizes[]) {
     getParsed(&codeSegmentContent, &constSegmentContent, args, sizes, &entryPoint, regs, segs);
 
     if(args->currentVmx){
-        createVm(virtualM, sizes, args->memory_size, entryPoint, codeSegmentContent, constSegmentContent, args->params, args->paramsAmount);
         virtualM->memory = (unsigned char*) malloc(args->memory_size * 1024);
+        createVm(virtualM, sizes, args->memory_size, entryPoint, codeSegmentContent, constSegmentContent, args->params, args->paramsAmount);
     }
     else
         restoreVm(virtualM, args, codeSegmentContent, regs, segs); // change name to restoreVm? mari: like it too, much more precise
 
     free(codeSegmentContent);
-    free(constSegmentContent); //is it so bad if we do this here? not really, is a local variabe after all
+
+    if (sizes[1])
+        free(constSegmentContent); //is it so bad if we do this here? not really, is a local variabe after all
 
     return virtualM;
 }
@@ -56,9 +58,22 @@ void createVm(VirtualMachine* virtualM, int sizes[], int memorySize, int entryPo
     vmSetUp(virtualM);
 
     if(sizes[1] > 0)
-        setMemoryContent(virtualM, constSegmentContent, sizes[1]);
+        setMemoryContent(virtualM, constSegmentContent, sizes[1], virtualM->registers[KS]);
 
-    setMemoryContent(virtualM, codeSegmentContent, sizes[2]);
+    setMemoryContent(virtualM, codeSegmentContent, sizes[2], virtualM->registers[CS]); // !
+
+    // for (int i = 0; i < 10; i++)
+    //     printf("%02X\n", codeSegmentContent[i]);
+
+    // for (int i = 0; i < virtualM->segment_table.descriptors[1].base+ virtualM->segment_table.descriptors[1].size; i++)
+    //     printf("%02X ", virtualM->memory[i]);
+    // printf("\n");
+
+    for (int i = 0; i < 8; i++)
+    {
+        printf("%d | %d\n", virtualM->segment_table.descriptors[i].base, virtualM->segment_table.descriptors[i].size);
+    }
+    
 }
 
 void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int paramSegmentSize, int paramsAmount) {
@@ -89,7 +104,7 @@ void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int
     for (int i = paramsAmount; i < pos; i++) //vacio la memoria que utilicé para los punteros
         free(paramsContent[i]);
 
-    setMemoryContent(virtualM, psContent, paramSegmentSize);
+    setMemoryContent(virtualM, psContent, paramSegmentSize, virtualM->registers[PS]);
 
     free(psContent);
 }
@@ -108,10 +123,10 @@ void restoreVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int
         virtualM->segment_table.descriptors[i].size = segs[i] & 0x0000FFFF;
     }
 
-    args->memory_size = (virtualM->segment_table.descriptors[DST_MAX -1].base + virtualM->segment_table.descriptors[DST_MAX -1].size)/1024; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
+    args->memory_size = (virtualM->segment_table.descriptors[6-1].base + virtualM->segment_table.descriptors[6-1].size)/1024; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
     virtualM->memory = (unsigned char*) malloc(args->memory_size * 1024);
 
-    setMemoryContent(virtualM, fileContent, args->memory_size * 1024);
+    setMemoryContent(virtualM, fileContent, args->memory_size * 1024, 0); // esto depende del vmi entonces se le pasa la posición lógica 0 para que inicie la escritura desde el comienzo de la memoria
 }
 
 void vmSetUp(VirtualMachine* virtualM) {
@@ -142,14 +157,21 @@ void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint, int par
     //    PUSH( main ret);   dont know how to charge the main ret adress
 }
 
-void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSize) {
+void setMemoryContent(VirtualMachine* virtualM, unsigned char* fileContent, int contentSize, int logicalAddress) {
     if (contentSize > DEFAULT_MEMORY_SIZE) {
         error_handler.buildError("Error: el tamaño del contenido {%d} excede la memoria disponible", contentSize);
     }
-    int address = transformLogicalAddress(virtualM->segment_table, virtualM->registers[CS]);
-    
-    for (int i = address; i < contentSize; i++)
-        virtualM->memory[i] = fileContent[i];
+    printf("\n-> %i <- ", logicalAddress >> 16);
+    int address = transformLogicalAddress(virtualM->segment_table, logicalAddress);
+    printf("\n");
+    printf("[%i]\n", address);
+    int j = 0;
+    for (int i = address, j=0; i < contentSize; i++, j++) {
+        printf("%02X ", fileContent[i]);
+        virtualM->memory[i] = fileContent[j];
+    }
+    printf("\n[%i]", address+contentSize);
+    printf("\n----------------------------------------");
 }
 
 void releaseVm(VirtualMachine* virtualM) {

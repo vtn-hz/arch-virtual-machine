@@ -18,6 +18,8 @@
 
 #include "system_calls.h"
 
+#include "vm_image.h"
+
 void initializeInstructions(VirtualMachine* vm) {
     vm->instructions[0x00] = SYS;
     vm->instructions[0x01] = JMP;

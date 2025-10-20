@@ -15,7 +15,7 @@ int isDebugEnabled( void* );
 
 int isDebugMode( VirtualMachine*, void* );
 
-void solveDebugAction( VirtualMachine*, char*, char ) ; 
+void solveDebugAction( VirtualMachine*, arguments, char ) ; 
 
 
 #endif

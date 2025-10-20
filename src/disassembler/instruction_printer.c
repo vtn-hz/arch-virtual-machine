@@ -142,7 +142,7 @@ void rawInstructionPrint(VirtualMachine* vm, int entryPoint) {
     int totalSize = opcSize + opaSize + opbSize;
     int fisicIp = transformLogicalAddress(vm->segment_table, vm->registers[IP]);
 
-    if (entryPoint == (vm->registers[IP] & 0xFFFF))
+    if (entryPoint != (vm->registers[IP]))
         printf(" ");
     else
         printf(">");
