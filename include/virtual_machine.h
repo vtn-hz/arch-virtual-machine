@@ -30,7 +30,7 @@ VirtualMachine* buildVm(arguments* args, int sizes[]);
  * 
  * @return A pointer to the newly created VirtualMachine.
  */
-void createVm(VirtualMachine* virtualM, int sizes[], int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsSize);
+void createVm(VirtualMachine* virtualM, int sizes[], int memorySize, int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsSize);
 
 /**
  * Sets the parameters content in memory, adding at the end the pointers to each parameter.
@@ -49,7 +49,7 @@ void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint, int par
 
 void vmSetUp(VirtualMachine*);
 
-void setMemoryContent(VirtualMachine*, char*, int);
+void setMemoryContent(VirtualMachine*, char*, int, int);
 
 void releaseVm(VirtualMachine*);
 
