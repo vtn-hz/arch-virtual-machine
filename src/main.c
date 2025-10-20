@@ -14,7 +14,7 @@
 
 int main(int argc, char** argv) {
     arguments args;
-    int sizes[6] = {0}; //order: param, const, code, data, extra, stack (same as to be saved in memory)
+    int sizes[6] = {0, 0, 0, 0, 0, 0}; //order: param, const, code, data, extra, stack (same as to be saved in memory)
 
     getArguments(argc, argv, &args, sizes); // param segment size
     
@@ -28,11 +28,11 @@ int main(int argc, char** argv) {
     // for (int i = 0; i < args.paramsAmount; i++)
     // printf("Parametro %d: %s\n", i + 1, args.params[i]);
 
-    // if (args.dissasembler) 
-    //     virtualMachinePrint(virtualM);
-    // virtualMachineRun(virtualM, args);
+    if (args.dissasembler) 
+        virtualMachinePrint(virtualM);
+    virtualMachineRun(virtualM, args);
     
-    // releaseVm(virtualM);
+    releaseVm(virtualM);
     return 0;
 }
 

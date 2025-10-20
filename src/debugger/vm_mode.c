@@ -34,6 +34,6 @@ void solveDebugAction(VirtualMachine* vm, arguments args, char action) {
     switch(vm->mode) {
         case DEBUG_MODE: buildImage(vm, args); break;
  
-        case QUIT_MODE: exit(EXIT_SUCCESS); break;
+        case QUIT_MODE:  exit(EXIT_SUCCESS);   break;
     }
 }  

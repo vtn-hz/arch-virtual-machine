@@ -12,6 +12,7 @@
 
 #include "error_handler.h"
 
+// 
 void arrToChars(int* intVec, int vecSize, char* charVec) {
     for (int i = 0; i < vecSize; i++) {
         int value = intVec[i];

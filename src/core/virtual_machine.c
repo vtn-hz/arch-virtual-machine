@@ -65,8 +65,15 @@ void createVm(VirtualMachine* virtualM, int sizes[], int memorySize, int entryPo
     // for (int i = 0; i < 10; i++)
     //     printf("%02X\n", codeSegmentContent[i]);
 
-    // for (int i = 0; i < virtualM->segment_table.descriptors[1].size; i++)
-    //     printf("%02X\n", virtualM->memory[i]);
+    // for (int i = 0; i < virtualM->segment_table.descriptors[1].base+ virtualM->segment_table.descriptors[1].size; i++)
+    //     printf("%02X ", virtualM->memory[i]);
+    // printf("\n");
+
+    for (int i = 0; i < 8; i++)
+    {
+        printf("%d | %d\n", virtualM->segment_table.descriptors[i].base, virtualM->segment_table.descriptors[i].size);
+    }
+    
 }
 
 void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int paramSegmentSize, int paramsAmount) {
@@ -116,7 +123,7 @@ void restoreVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int
         virtualM->segment_table.descriptors[i].size = segs[i] & 0x0000FFFF;
     }
 
-    args->memory_size = (virtualM->segment_table.descriptors[DST_MAX -1].base + virtualM->segment_table.descriptors[DST_MAX -1].size)/1024; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
+    args->memory_size = (virtualM->segment_table.descriptors[6-1].base + virtualM->segment_table.descriptors[6-1].size)/1024; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
     virtualM->memory = (unsigned char*) malloc(args->memory_size * 1024);
 
     setMemoryContent(virtualM, fileContent, args->memory_size * 1024, 0); // esto depende del vmi entonces se le pasa la posición lógica 0 para que inicie la escritura desde el comienzo de la memoria
@@ -150,14 +157,21 @@ void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint, int par
     //    PUSH( main ret);   dont know how to charge the main ret adress
 }
 
-void setMemoryContent(VirtualMachine* virtualM, char* fileContent, int contentSize, int logicalAddress) {
+void setMemoryContent(VirtualMachine* virtualM, unsigned char* fileContent, int contentSize, int logicalAddress) {
     if (contentSize > DEFAULT_MEMORY_SIZE) {
         error_handler.buildError("Error: el tamaño del contenido {%d} excede la memoria disponible", contentSize);
     }
+    printf("\n-> %i <- ", logicalAddress >> 16);
     int address = transformLogicalAddress(virtualM->segment_table, logicalAddress);
-    
-    for (int i = address; i < contentSize; i++)
-        virtualM->memory[i] = fileContent[i];
+    printf("\n");
+    printf("[%i]\n", address);
+    int j = 0;
+    for (int i = address, j=0; i < contentSize; i++, j++) {
+        printf("%02X ", fileContent[i]);
+        virtualM->memory[i] = fileContent[j];
+    }
+    printf("\n[%i]", address+contentSize);
+    printf("\n----------------------------------------");
 }
 
 void releaseVm(VirtualMachine* virtualM) {

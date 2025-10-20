@@ -49,7 +49,7 @@ void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint, int par
 
 void vmSetUp(VirtualMachine*);
 
-void setMemoryContent(VirtualMachine*, char*, int, int);
+void setMemoryContent(VirtualMachine*, unsigned char*, int, int);
 
 void releaseVm(VirtualMachine*);
 
