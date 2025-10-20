@@ -21,7 +21,7 @@ void getArguments(int argc, char** argv, arguments* args, int sizes[]) {
     if (argc < 2)
         error_handler.fileNotFound();
 
-    while ( i < argc && (strcmp(argv[i], "-p") != 0) ) {
+    while ( i < (argc - 1 ) && (strcmp(argv[i], "-p") != 0) ) {
         dispatchArguments(argv, ++i, argc, args, sizes);
     }    
 
