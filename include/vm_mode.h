@@ -3,6 +3,8 @@
 
 typedef struct VirtualMachine VirtualMachine;
 
+#include "arguments_parsing.h"
+
 #define DEBUG_MODE 'd'
 
 #define GO_MODE 'g'
@@ -11,9 +13,9 @@ typedef struct VirtualMachine VirtualMachine;
 
 char askDebugAction () ;
 
-int isDebugEnabled( void* ); 
+int isDebugEnabled( arguments ); 
 
-int isDebugMode( VirtualMachine*, void* );
+int isDebugMode( VirtualMachine*, arguments );
 
 void solveDebugAction( VirtualMachine*, arguments, char ) ; 
 

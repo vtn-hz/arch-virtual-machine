@@ -7,12 +7,14 @@
 
 #include "vm_mode.h"
 
-int isDebugEnabled( void* params ) {
-    return 1; // check params
+#include "arguments_parsing.h"
+
+int isDebugEnabled( arguments args ) {
+    return args.currentVmi != NULL;
 }
 
-int isDebugMode( VirtualMachine* vm, void* params ) {
-    if ( !isDebugEnabled(params) ) 
+int isDebugMode( VirtualMachine* vm, arguments args ) {
+    if ( !isDebugEnabled(args) ) 
         return 0;
 
     return vm->mode == DEBUG_MODE;
@@ -34,6 +36,6 @@ void solveDebugAction(VirtualMachine* vm, arguments args, char action) {
     switch(vm->mode) {
         case DEBUG_MODE: buildImage(vm, args); break;
  
-        case QUIT_MODE:  exit(EXIT_SUCCESS);   break;
+        case QUIT_MODE:  exit(EXIT_SUCCESS);    break;
     }
 }  

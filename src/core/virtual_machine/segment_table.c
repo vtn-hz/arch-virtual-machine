@@ -16,7 +16,6 @@ void createSegmentTable(DST* table, int memorySize) {
 void initSegmentTable(DST* table, int sizes[], int reg[]) { //could be called by createVm or the function that extracts data from files
 
     for(int i = 0; i < 6; i++) {
-        printf("%04X\n", sizes[i]);
         if(sizes[i] > 0) {
             /* good job here, i think it works */ 
 
