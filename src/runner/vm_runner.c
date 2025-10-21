@@ -31,7 +31,6 @@ void virtualMachineRun(VirtualMachine* virtualM, arguments args) {
         prepareInstruction(virtualM);
         advanceInstructionPointer(virtualM);
         executeInstruction(virtualM);  
-        printf("%04X\n", virtualM->registers[IP] & 0xFFFF);
     }
 }
 

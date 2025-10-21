@@ -45,34 +45,39 @@ VirtualMachine* buildVm(arguments* args, int sizes[]) {
     return virtualM;
 }
 
-void createVm(VirtualMachine* virtualM, int sizes[], int memorySize, int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsAmount) { 
+void createVm(VirtualMachine* vm, int sizes[], int memorySize, int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsAmount) { 
     int reg[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     if(sizes[0] > 0)
-       setParamContentInMemory(virtualM, paramSegmentContent, sizes[0], paramsAmount);
+       setParamContentInMemory(vm, paramSegmentContent, sizes[0], paramsAmount);
 
-    createSegmentTable(&virtualM->segment_table, memorySize);
-    initSegmentTable(&virtualM->segment_table, sizes, reg); 
-    setSTRegisters(virtualM, reg, entryPoint, sizes[0] - (paramsAmount*4)); //i send the size of the params minus the size of the pointers
+    createSegmentTable(&vm->segment_table, memorySize);
+    initSegmentTable(&vm->segment_table, sizes, reg); 
+    setSTRegisters(vm, reg, entryPoint, sizes[0] - (paramsAmount*4)); //i send the size of the params minus the size of the pointers
 
-    vmSetUp(virtualM);
+    vmSetUp(vm);
 
     if(sizes[1] > 0)
-        setMemoryContent(virtualM, constSegmentContent, sizes[1], virtualM->registers[KS]);
+        setMemoryContent(vm, constSegmentContent, sizes[1], vm->registers[KS]);
 
-    setMemoryContent(virtualM, codeSegmentContent, sizes[2], virtualM->registers[CS]); // !
+    int x = sizes[2];
+    setMemoryContent(vm, codeSegmentContent, x, vm->registers[CS]); // !
 
-    // for (int i = 0; i < 10; i++)
-    //     printf("%02X\n", codeSegmentContent[i]);
 
-    // for (int i = 0; i < virtualM->segment_table.descriptors[1].base+ virtualM->segment_table.descriptors[1].size; i++)
-    //     printf("%02X ", virtualM->memory[i]);
-    // printf("\n");
+    for (int i = 0; i < sizes[2]; i++)
+        printf("%02X ", (unsigned char) codeSegmentContent[i]);
 
+    printf("VM Created Successfully!\n");
+    printf("Memory Dump:\n");
+    int total = vm->segment_table.descriptors[ vm->segment_table.counter-1 ].base +
+                vm->segment_table.descriptors[ vm->segment_table.counter-1 ].size;
+    for (int i = 0; i < 100; i++)
+        printf("%02X ", vm->memory[i]);
+
+    printf("\nSegment Table:\n");
     for (int i = 0; i < 8; i++)
-    {
-        printf("%d | %d\n", virtualM->segment_table.descriptors[i].base, virtualM->segment_table.descriptors[i].size);
-    }
+        printf("%-8d | %-8d\n", vm->segment_table.descriptors[i].base, vm->segment_table.descriptors[i].size);
+    
     
 }
 
@@ -158,20 +163,12 @@ void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint, int par
 }
 
 void setMemoryContent(VirtualMachine* virtualM, unsigned char* fileContent, int contentSize, int logicalAddress) {
-    if (contentSize > DEFAULT_MEMORY_SIZE) {
+    if (contentSize > DEFAULT_MEMORY_SIZE) 
         error_handler.buildError("Error: el tamaño del contenido {%d} excede la memoria disponible", contentSize);
-    }
-    printf("\n-> %i <- ", logicalAddress >> 16);
+
     int address = transformLogicalAddress(virtualM->segment_table, logicalAddress);
-    printf("\n");
-    printf("[%i]\n", address);
-    int j = 0;
-    for (int i = address, j=0; i < contentSize; i++, j++) {
-        printf("%02X ", fileContent[i]);
-        virtualM->memory[i] = fileContent[j];
-    }
-    printf("\n[%i]", address+contentSize);
-    printf("\n----------------------------------------");
+    for (int i = address, j=0; j < contentSize; i++, j++)
+        virtualM->memory[i] = fileContent[j];  
 }
 
 void releaseVm(VirtualMachine* virtualM) {
