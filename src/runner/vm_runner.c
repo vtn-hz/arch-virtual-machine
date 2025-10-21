@@ -24,7 +24,7 @@ void executeInstruction(VirtualMachine*);
 void virtualMachineRun(VirtualMachine* virtualM, arguments args) {
     while (!isSegmentCodeEnded(virtualM)) {
 
-        if ( isDebugMode(virtualM, args.params) ) {
+        if ( isDebugMode(virtualM, args) ) {
             solveDebugAction(virtualM, args, askDebugAction());
         }
       
