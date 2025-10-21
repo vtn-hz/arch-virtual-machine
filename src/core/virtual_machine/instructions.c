@@ -291,7 +291,7 @@ void PUSH(VirtualMachine* vm) {
         valen:   yo interpreto que "cada vez que se realiza una operación en la memoria" 
                  significa que es cualquier acceso a memoria (STACK INCLUÍDO)
     */ 
-    prepareSetMemoryAccess(vm, SP, 0, DEFAULT_ACCESS_SIZE, data);
+    prepareSetMemoryAccess(vm, SP, 0, data, DEFAULT_ACCESS_SIZE);
     commitSetMemoryAccess(vm);
 }
 
@@ -313,7 +313,7 @@ void CALL(VirtualMachine* vm) {
     if (!isLogicalAddressValid(vm->segment_table, vm->registers[SP])) 
         error_handler.stackOverflow();
 
-    prepareSetMemoryAccess(vm, SP, 0, DEFAULT_ACCESS_SIZE, vm->registers[IP]);
+    prepareSetMemoryAccess(vm, SP, 0, vm->registers[IP], DEFAULT_ACCESS_SIZE);
     commitSetMemoryAccess(vm);
 
     vm->registers[IP] = vm->registers[CS] | (data & 0xFFFF);
