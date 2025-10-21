@@ -27,6 +27,8 @@ void getArguments(int argc, char** argv, arguments* args, int sizes[]) {
 
     if(args->currentVmx == NULL && args->currentVmi== NULL)
         error_handler.buildError("Error: se requiere un archivo .vmx o .vmi");
+
+    
 }
 
 int solveArgumentType(char* argument, int i) {

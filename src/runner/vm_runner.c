@@ -22,6 +22,10 @@ void advanceInstructionPointer(VirtualMachine*);
 void executeInstruction(VirtualMachine*);
 
 void virtualMachineRun(VirtualMachine* virtualM, arguments args) {
+
+    // printf("IP: %08X", virtualM->registers[IP]);
+    // printf(" | %d ", !isSegmentCodeEnded(virtualM));
+    // printf(" | %d ", isDebugMode(virtualM, args) );
     while (!isSegmentCodeEnded(virtualM)) {
 
         if ( isDebugMode(virtualM, args) ) {

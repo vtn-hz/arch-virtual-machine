@@ -35,7 +35,7 @@ void createVm(VirtualMachine* virtualM, int sizes[], int memorySize, int entryPo
 /**
  * Sets the parameters content in memory, adding at the end the pointers to each parameter.
  */
-void setParamContentInMemory(VirtualMachine* virtualM, char** paramsContent, int paramSegmentSize, int paramsSize);
+void setParamContentInMemory(VirtualMachine* virtualM, int memorySize, char** paramsContent, int paramSegmentSize, int paramsSize);
 
 /**
  * Builds the virtual machine from the provided registers and segments of a vmi file.
@@ -47,9 +47,9 @@ void restoreVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int
  */
 void setSTRegisters(VirtualMachine* virtualM, int reg[], int entrypoint, int paramsSize);
 
-void vmSetUp(VirtualMachine*);
+void vmSetUp(VirtualMachine*, char);
 
-void setMemoryContent(VirtualMachine*, unsigned char*, int, int);
+void setMemoryContent(VirtualMachine*, int, unsigned char*, int, int);
 
 void releaseVm(VirtualMachine*);
 

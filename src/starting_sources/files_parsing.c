@@ -16,14 +16,15 @@ void getParsed(char** codeSegmentContent, char** constSegmentContent, arguments*
     
     if(args->currentVmx)
         file = fopen(args->currentVmx, "rb");
-    else
+    else{
         file = fopen(args->currentVmi, "rb");
-
+    }
+    
     if (file == NULL)
         error_handler.fileNotFound();
-
+    
     readIdentifier(file, &version);
-
+    
     if (args->currentVmx)
         if(version == 2)
             vmxVersionTwo(file, codeSegmentContent, constSegmentContent, entryPoint, sizes);
@@ -32,8 +33,8 @@ void getParsed(char** codeSegmentContent, char** constSegmentContent, arguments*
             vmxVersionOne(file, codeSegmentContent, sizes);   
     
     else
-        //vmiVersionOne(file, codeSegmentContent, args, regs, segs);
-    
+        vmiVersionOne(file, codeSegmentContent, args, regs, segs);
+
     fclose(file);
 }
 
@@ -67,23 +68,22 @@ void vmxVersionTwo(FILE* file, char **codeSegmentContent, char** constSegmentCon
 
 void vmiVersionOne(FILE* file, char** fileContent, arguments* args, int regs[], int segs[]){
     char temp[5];
-
+    
     fread(temp, sizeof(char), 2, file); //memory size
     args->memory_size = (unsigned char)temp[0] << 8 | (unsigned char)temp[1];
-
+    
     for(int i = 0; i < 32; i++){
         fread(temp, sizeof(char), 4, file); //i do this here 'cause of the big endian issue
         regs[i] =(unsigned char)temp[0] << 24 | (unsigned char)temp[1] << 16 | (unsigned char)temp[2] << 8 | (unsigned char)temp[3]; 
     }
-
+    
     for(int i = 0; i < 8; i++){
         fread(temp, sizeof(char), 4, file); 
         segs[i] = (unsigned char)temp[0] << 24 | (unsigned char)temp[1] << 16 | (unsigned char)temp[2] << 8 | (unsigned char)temp[3]; 
     }
 
     *fileContent = (char*) malloc(args->memory_size*1024);
-    fread(fileContent, sizeof(char), args->memory_size*1024, file); //we read the whole memory content here, not just the code segment   
-
+    fread(*fileContent, sizeof(char), args->memory_size*1024, file); //we read the whole memory content here, not just the code segment   
 }
 
 void readSizes(FILE* file, int sizes[]) {

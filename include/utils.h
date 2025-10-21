@@ -106,6 +106,6 @@ int extractOperationBaseRegister(int operand);
  * @param number The integer to convert
  * @return A pointer to the string representation of the integer
  */
-char* intToString(int number);
+char* toBigEndian( char* bytes, unsigned int val, int n);
 
 #endif

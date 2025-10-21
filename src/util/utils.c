@@ -45,9 +45,7 @@ int extractOperationValue(int operand) {
 
 int extractOperationBaseRegister(int operand) {
     return applyMask(operand, 0x001F0000, 16);
-}
-
-char* intToString(int number){
+}char* intToString(int number){
     char* cad = ( char*) malloc (4 * sizeof(char));
 
     cad[0] = ((number >> 24) & 0xFF);
@@ -56,4 +54,13 @@ char* intToString(int number){
     cad[3] = (number & 0xFF);    
     
     return cad;
+}
+
+char* toBigEndian(char* bytes, unsigned int val, int n) {
+    for (int i = n-1; i >= 0; i--) {
+        bytes[i] = val & 0xFF;
+        val = val >> 8;  
+    }
+
+    return bytes;
 }

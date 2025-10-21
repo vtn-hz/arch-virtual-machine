@@ -68,6 +68,7 @@ void addSegment(DST* table, unsigned short size) {
     }
 
     // here maybe we have to add available_memory to DST struct to check if we have enough memory (now is variable) mari: like it, done
+    // printf("%d vs %d\n", base + size, table->available_memory);
     if (base + size > table->available_memory) 
         error_handler.buildError("Error: {base: %d, size: %d} memoria solicitada no disponible", base, size); // not enough memory   
 
