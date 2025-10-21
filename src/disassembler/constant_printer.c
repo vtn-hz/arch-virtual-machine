@@ -44,10 +44,10 @@ void printParsedConstantItem(VirtualMachine *vm, int kfisicPointer) {
 }   
 
 void printRawConstantItem(VirtualMachine *vm, int kfisicPointer) {
-    int marginLeft = 8;
+    int marginLeft = 7;
     int totalSize = 0;
 
-    printf(" [%04X]:", kfisicPointer);
+    printf(" [%04X]", kfisicPointer);
 
     while( vm->memory[kfisicPointer] && totalSize < 6 ) {
         printf(" %02X", vm->memory[kfisicPointer]);
