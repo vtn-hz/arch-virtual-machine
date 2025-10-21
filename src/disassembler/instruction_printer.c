@@ -114,21 +114,21 @@ void printOperandMemory(int operand) {
     if (REGISTERS_STR[registerCode] == NULL)
         error_handler.buildError("Error: {%x} registro es invalido ", registerCode);
 
-    char sizeTags[4] = {'\0', 'w', 0, 'b'};
+    const char* sizeTags[4] = {"", "w", 0, "b"};
     char buffer[64];
 
     if (offset != 0) {
         char sign = offset > 0 ? '+' : '-';
         offset = offset > 0 ? offset : -offset;
-        sprintf(buffer, "%c[%s %c %d]", sizeTags[tagId], REGISTERS_STR[registerCode], sign, offset);
+        sprintf(buffer, "%s[%s %c %d]", sizeTags[tagId], REGISTERS_STR[registerCode], sign, offset);
     } else
-        sprintf(buffer, "%c[%s]", sizeTags[tagId], REGISTERS_STR[registerCode]);
+        sprintf(buffer, "%s[%s]", sizeTags[tagId], REGISTERS_STR[registerCode]);
 
     printf("%10s", buffer);
 }
 
 void rawInstructionPrint(VirtualMachine* vm, int entryPoint) {
-    int marginLeft = 8;
+    int marginLeft = 7;
     int opaSize = extractOperationType(vm->registers[OP1]);
     int opbSize = extractOperationType(vm->registers[OP2]);
     int opcSize = 1;
