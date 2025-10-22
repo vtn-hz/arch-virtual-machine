@@ -18,7 +18,7 @@
 
 #include "utils.h"
 
-void initializeStack( VirtualMachine* vm, int entryPoint ) ;
+void initializeStack( VirtualMachine* vm, int entryPoint, int argc, int argv ); ;
 
 VirtualMachine* buildVm(arguments* args, int sizes[]) {
     // name is confuse, maybe sizes couuld be inside args? (initializer package)  mari: i like it, should change it everywhere tho
@@ -68,8 +68,6 @@ void createVm(VirtualMachine* vm, int sizes[], int memorySize, int entryPoint, c
     setMemoryContent(vm, memorySize, codeSegmentContent, sizes[2], vm->registers[CS]); // !
 
 
-    printf("VM Created Successfully!\n");
-    // printf("Memory Dump:\n");
     int total = vm->segment_table.descriptors[ vm->segment_table.counter-1 ].base +
                 vm->segment_table.descriptors[ vm->segment_table.counter-1 ].size;
     // for (int i = 0; i < 100; i++)
@@ -79,16 +77,23 @@ void createVm(VirtualMachine* vm, int sizes[], int memorySize, int entryPoint, c
     // for (int i = 0; i < 8; i++)
     //     printf("%-8d | %-8d\n", vm->segment_table.descriptors[i].base, vm->segment_table.descriptors[i].size);
 
-    initializeStack( vm, entryPoint);
+    initializeStack( vm, entryPoint, paramsAmount, sizes[0] > 0 ? (sizes[0] - (paramsAmount*4)) : -1);
 }
 
-void initializeStack( VirtualMachine* vm, int entryPoint ) {
+void initializeStack( VirtualMachine* vm, int entryPoint, int argc, int argv ) {
     if (entryPoint == 0) 
         return;
 
     if (vm->registers[SS] == -1) 
         return;
 
+    vm->registers[SP] -= 4;
+    prepareSetMemoryAccess(vm, SP, 0, argv, DEFAULT_ACCESS_SIZE); // vm->registers[PS] could be sent instead of argv
+    commitSetMemoryAccess(vm);
+    
+    vm->registers[SP] -= 4;
+    prepareSetMemoryAccess(vm, SP, 0, argc, DEFAULT_ACCESS_SIZE);
+    commitSetMemoryAccess(vm);
 
     vm->registers[SP] -= 4;
     prepareSetMemoryAccess(vm, SP, 0, -1, DEFAULT_ACCESS_SIZE);
@@ -106,14 +111,17 @@ void setParamContentInMemory(VirtualMachine* virtualM, int memorySize, char** pa
     char* psContent = (char*) malloc(paramSegmentSize);
 
     for( i = 0; i < paramsAmount; i++){ //cálculo de los punteros
-        pointers[i] = (0x0000 << 16) | previousSize;// whats mean the 0x0000 << 16 ? mari: just to give it the 4 bytes format, kinda ugly tho
+        pointers[i] = (0x0000 << 16) | previousSize;
         previousSize += strlen(paramsContent[i]) + 1; //+1 for the null terminator
     }
 
     int pos = paramsAmount;
     for( i = 0; i < paramsAmount; i++){ // paso los punteros a string (tal vez es innecesario, puede verse)
         toBigEndian(cad, pointers[i], 4);
-        paramsContent[pos] = cad;
+        
+        for( int j = 0; j < 4; j++)
+            paramsContent[pos][j] = cad[j];
+        
         pos++;
     }
 
@@ -123,35 +131,30 @@ void setParamContentInMemory(VirtualMachine* virtualM, int memorySize, char** pa
         offset += strlen(paramsContent[i]) + 1; // +1 por el '\0'
     }
 
-    for (int i = paramsAmount; i < pos; i++) //vacio la memoria que utilicé para los punteros
-        free(paramsContent[i]);
-
     setMemoryContent(virtualM, memorySize, psContent, paramSegmentSize, virtualM->registers[PS]);
 
     free(psContent);
 }
     
-void restoreVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]) {
+void restoreVm(VirtualMachine* vm, arguments* args, char* fileContent, int regs[], int segs[]) {
 
-    createSegmentTable(&virtualM->segment_table, args->memory_size); //careful here, memory size sent is the default one 'cause we dont have it in vmi files, we calculate it later
+    createSegmentTable(&vm->segment_table, args->memory_size); //careful here, memory size sent is the default one 'cause we dont have it in vmi files, we calculate it later
     // printf("Segment table created succesfully\n");
-    vmSetUp(virtualM, DEBUG_MODE);
+    vmSetUp(vm, DEBUG_MODE);
 
     for(int i = 0; i < 32; i++)
-        virtualM->registers[i] = regs[i];
+        vm->registers[i] = regs[i];
     
-    for(int i = 0; i < DST_MAX; i++){
-        if(segs[i]!= -1){
-            addSegment(&virtualM->segment_table, segs[i] & 0xFFFF);
-        }
-    }
+    for(int i = 0; i < DST_MAX; i++)
+        if(segs[i]!= -1)
+            addSegment(&vm->segment_table, segs[i] & 0xFFFF);
 
-    args->memory_size = (virtualM->segment_table.descriptors[6-1].base + virtualM->segment_table.descriptors[6-1].size)/1024; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
-    virtualM->memory = (unsigned char*) malloc(args->memory_size * 1024);
+    args->memory_size = (vm->segment_table.descriptors[vm->segment_table.counter - 1].base + vm->segment_table.descriptors[vm->segment_table.counter - 1].size)/1024; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
+    
+    vm->memory = (unsigned char*) malloc(args->memory_size * 1024);
 
-    //setMemoryContent(virtualM, args->memory_size*1024, fileContent, args->memory_size * 1024, 0); // esto depende del vmi entonces se le pasa la posición lógica 0 para que inicie la escritura desde el comienzo de la memoria
     for (int i = 0; i < args->memory_size*1024; i++)
-        virtualM->memory[i] = fileContent[i];  
+        vm->memory[i] = fileContent[i];  
 }
 
 void vmSetUp(VirtualMachine* virtualM, char mode) {
@@ -178,14 +181,9 @@ void setSTRegisters(VirtualMachine* virtualM, int reg[], int entryPoint, int par
     // here we have to set SP to the bottom of the stack segment
     // something like: registers[SP] = (registers[SS] & (virtualM->segment_table[ registers[SS] >> 16 ]).size)  mari: has to be or 'cause it would be all zeros otherwise
     registers[SP] = (registers[SS] | virtualM->segment_table.descriptors[registers[SS] >> 16].size);
-    if(entryPoint != 0) {
-        //  dont know how to charge the main ret adress // i know how 😎
-        
-    }
 }
 
 void setMemoryContent(VirtualMachine* virtualM, int memorySize, unsigned char* fileContent, int contentSize, int logicalAddress) {
-    // printf("Memory: %d\n", memorySize);
     if (contentSize > memorySize * 1024) 
         error_handler.buildError("Error: el tamaño del contenido {%d} excede la memoria disponible", contentSize);
 
