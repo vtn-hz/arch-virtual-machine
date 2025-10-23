@@ -114,7 +114,7 @@ void printOperandMemory(int operand) {
     if (REGISTERS_STR[registerCode] == NULL)
         error_handler.buildError("Error: {%x} registro es invalido ", registerCode);
 
-    const char* sizeTags[4] = {"", "w", 0, "b"};
+    const char* sizeTags[4] = {"", NULL, "w", "b"};
     char buffer[64];
 
     if (offset != 0) {

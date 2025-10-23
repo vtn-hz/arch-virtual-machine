@@ -18,14 +18,14 @@
 
 #include "utils.h"
 
-void initializeStack( VirtualMachine* vm, int entryPoint ) ;
+void initializeStack( VirtualMachine* vm, int entryPoint, int argc, int argv ); ;
 
 VirtualMachine* buildVm(arguments* args, int sizes[]) {
     // name is confuse, maybe sizes couuld be inside args? (initializer package)  mari: i like it, should change it everywhere tho
     VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
     
     char* codeSegmentContent;
-    int entryPoint = 0;
+    int entryPoint = -1;
     char* constSegmentContent;
     int regs[32]; //only for the vmi, kind of wasteful but easier this way
     int segs[8];
@@ -54,12 +54,17 @@ VirtualMachine* buildVm(arguments* args, int sizes[]) {
 void createVm(VirtualMachine* vm, int sizes[], int memorySize, int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsAmount) { 
     int reg[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
-    if(sizes[0] > 0)
-       setParamContentInMemory(vm, memorySize, paramSegmentContent, sizes[0], paramsAmount);
+    // printf("entrypoint: %08X \n",entryPoint);
+    // printf("esta en crear la vm\n");
+    // printf("cantidad de parametros: %d\n",paramsAmount);
+    // printf("parametro: %s \n",paramSegmentContent[0]);
 
     createSegmentTable(&vm->segment_table, memorySize);
     initSegmentTable(&vm->segment_table, sizes, reg); 
     setSTRegisters(vm, reg, entryPoint, sizes[0] - (paramsAmount*4)); //i send the size of the params minus the size of the pointers
+    
+    if(sizes[0] > 0)
+        setParamContentInMemory(vm, memorySize, paramSegmentContent, sizes[0], paramsAmount);
 
     vmSetUp(vm, GO_MODE);
 
@@ -67,8 +72,6 @@ void createVm(VirtualMachine* vm, int sizes[], int memorySize, int entryPoint, c
         setMemoryContent(vm, memorySize, constSegmentContent, sizes[1], vm->registers[KS]);
     setMemoryContent(vm, memorySize, codeSegmentContent, sizes[2], vm->registers[CS]); // !
 
-
-    printf("VM Created Successfully!\n");
     // printf("Memory Dump:\n");
     int total = vm->segment_table.descriptors[ vm->segment_table.counter-1 ].base +
                 vm->segment_table.descriptors[ vm->segment_table.counter-1 ].size;
@@ -79,16 +82,23 @@ void createVm(VirtualMachine* vm, int sizes[], int memorySize, int entryPoint, c
     // for (int i = 0; i < 8; i++)
     //     printf("%-8d | %-8d\n", vm->segment_table.descriptors[i].base, vm->segment_table.descriptors[i].size);
 
-    initializeStack( vm, entryPoint);
+    initializeStack( vm, entryPoint, paramsAmount, sizes[0] > 0 ? (sizes[0] - (paramsAmount*4)) : -1);
 }
 
-void initializeStack( VirtualMachine* vm, int entryPoint ) {
-    if (entryPoint == 0) 
+void initializeStack( VirtualMachine* vm, int entryPoint, int argc, int argv ) {
+    if (entryPoint == -1) 
         return;
 
     if (vm->registers[SS] == -1) 
         return;
 
+    vm->registers[SP] -= 4;
+    prepareSetMemoryAccess(vm, SP, 0, argv, DEFAULT_ACCESS_SIZE); // vm->registers[PS] could be sent instead of argv
+    commitSetMemoryAccess(vm);
+    
+    vm->registers[SP] -= 4;
+    prepareSetMemoryAccess(vm, SP, 0, argc, DEFAULT_ACCESS_SIZE);
+    commitSetMemoryAccess(vm);
 
     vm->registers[SP] -= 4;
     prepareSetMemoryAccess(vm, SP, 0, -1, DEFAULT_ACCESS_SIZE);
@@ -97,7 +107,6 @@ void initializeStack( VirtualMachine* vm, int entryPoint ) {
 
 
 void setParamContentInMemory(VirtualMachine* virtualM, int memorySize, char** paramsContent, int paramSegmentSize, int paramsAmount) {
-    return;
     int pointers[paramsAmount];
     int previousSize = 0;
     int i;
@@ -106,52 +115,65 @@ void setParamContentInMemory(VirtualMachine* virtualM, int memorySize, char** pa
     char* psContent = (char*) malloc(paramSegmentSize);
 
     for( i = 0; i < paramsAmount; i++){ //cálculo de los punteros
-        pointers[i] = (0x0000 << 16) | previousSize;// whats mean the 0x0000 << 16 ? mari: just to give it the 4 bytes format, kinda ugly tho
+        pointers[i] = (0x0000 << 16) | previousSize;
         previousSize += strlen(paramsContent[i]) + 1; //+1 for the null terminator
     }
 
     int pos = paramsAmount;
     for( i = 0; i < paramsAmount; i++){ // paso los punteros a string (tal vez es innecesario, puede verse)
         toBigEndian(cad, pointers[i], 4);
-        paramsContent[pos] = cad;
+        printf("entra al for \n");
+        paramsContent[pos] = malloc (4);
+        for( int j = 0; j < 4; j++)
+            paramsContent[pos][j] = cad[j];
         pos++;
     }
+    
+    size_t offset = 0;
+    // for (i = 0; i < paramsAmount; i++) { //es paramsamount porque es la cantidad de strings
+    //     printf("en paramsContent: %s \n",paramsContent[i]);
+    //     strcpy(psContent + offset, paramsContent[i]);
+    //     printf("en psContent: %s \n",psContent[i]);
+    //     offset += strlen(paramsContent[i]) + 1; // +1 por el '\0'
+    // }    
 
-    int offset = 0;
-    for (i = 0; i < paramsAmount; i++) { //es paramsamount porque es la cantidad de strings
-        strcpy(psContent + offset, paramsContent[i]);
-        offset += strlen(paramsContent[i]) + 1; // +1 por el '\0'
+    // Para los primeros strings:
+    for (i = 0; i < paramsAmount; i++) {
+        size_t len = strlen(paramsContent[i]) + 1;
+        memcpy(psContent + offset, paramsContent[i], len);
+        offset += len;
     }
 
-    for (int i = paramsAmount; i < pos; i++) //vacio la memoria que utilicé para los punteros
-        free(paramsContent[i]);
+    // Para los punteros en binario (4 bytes c/u)
+    for (i = paramsAmount; i < pos; i++) {
+        memcpy(psContent + offset, paramsContent[i], 4);
+        offset += 4;
+    }
 
-    setMemoryContent(virtualM, memorySize, psContent, paramSegmentSize, virtualM->registers[PS]);
+    setMemoryContent(virtualM, memorySize, psContent, paramSegmentSize, 0);
 
     free(psContent);
 }
     
-void restoreVm(VirtualMachine* virtualM, arguments* args, char* fileContent, int regs[], int segs[]) {
+void restoreVm(VirtualMachine* vm, arguments* args, char* fileContent, int regs[], int segs[]) {
 
-    createSegmentTable(&virtualM->segment_table, args->memory_size); //careful here, memory size sent is the default one 'cause we dont have it in vmi files, we calculate it later
+    createSegmentTable(&vm->segment_table, args->memory_size); //careful here, memory size sent is the default one 'cause we dont have it in vmi files, we calculate it later
     // printf("Segment table created succesfully\n");
-    vmSetUp(virtualM, DEBUG_MODE);
+    vmSetUp(vm, DEBUG_MODE);
 
     for(int i = 0; i < 32; i++)
-        virtualM->registers[i] = regs[i];
+        vm->registers[i] = regs[i];
     
-    for(int i = 0; i < DST_MAX; i++){
-        if(segs[i]!= -1){
-            addSegment(&virtualM->segment_table, segs[i] & 0xFFFF);
-        }
-    }
+    for(int i = 0; i < DST_MAX; i++)
+        if(segs[i]!= -1)
+            addSegment(&vm->segment_table, segs[i] & 0xFFFF);
 
-    args->memory_size = (virtualM->segment_table.descriptors[6-1].base + virtualM->segment_table.descriptors[6-1].size)/1024; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
-    virtualM->memory = (unsigned char*) malloc(args->memory_size * 1024);
+    args->memory_size = (vm->segment_table.descriptors[vm->segment_table.counter - 1].base + vm->segment_table.descriptors[vm->segment_table.counter - 1].size)/1024; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
+    
+    vm->memory = (unsigned char*) malloc(args->memory_size * 1024);
 
-    //setMemoryContent(virtualM, args->memory_size*1024, fileContent, args->memory_size * 1024, 0); // esto depende del vmi entonces se le pasa la posición lógica 0 para que inicie la escritura desde el comienzo de la memoria
     for (int i = 0; i < args->memory_size*1024; i++)
-        virtualM->memory[i] = fileContent[i];  
+        vm->memory[i] = fileContent[i];  
 }
 
 void vmSetUp(VirtualMachine* virtualM, char mode) {
@@ -174,18 +196,14 @@ void setSTRegisters(VirtualMachine* virtualM, int reg[], int entryPoint, int par
     registers[ES] = reg[4];
     registers[SS] = reg[5];
 
+    entryPoint = entryPoint == -1 ? 0 : entryPoint;
     registers[IP] = (registers[CS] & 0xFFFF0000) | (entryPoint & 0x0000FFFF);
     // here we have to set SP to the bottom of the stack segment
     // something like: registers[SP] = (registers[SS] & (virtualM->segment_table[ registers[SS] >> 16 ]).size)  mari: has to be or 'cause it would be all zeros otherwise
     registers[SP] = (registers[SS] | virtualM->segment_table.descriptors[registers[SS] >> 16].size);
-    if(entryPoint != 0) {
-        //  dont know how to charge the main ret adress // i know how 😎
-        
-    }
 }
 
 void setMemoryContent(VirtualMachine* virtualM, int memorySize, unsigned char* fileContent, int contentSize, int logicalAddress) {
-    // printf("Memory: %d\n", memorySize);
     if (contentSize > memorySize * 1024) 
         error_handler.buildError("Error: el tamaño del contenido {%d} excede la memoria disponible", contentSize);
 

@@ -31,7 +31,7 @@ int extractRegisterId(int operand) {
 }
 
 int extractOperationCellSize(int operand) {
-    return applyMaskAfter(operand, 0x3, 21);
+    return applyMaskAfter(operand, 0b11, 22);
 }
 
 int extractOperationType(int operand) {
@@ -45,15 +45,6 @@ int extractOperationValue(int operand) {
 
 int extractOperationBaseRegister(int operand) {
     return applyMask(operand, 0x001F0000, 16);
-}char* intToString(int number){
-    char* cad = ( char*) malloc (4 * sizeof(char));
-
-    cad[0] = ((number >> 24) & 0xFF);
-    cad[1] = ((number >> 16) & 0xFF);
-    cad[2] = ((number >> 8) & 0xFF);
-    cad[3] = (number & 0xFF);    
-    
-    return cad;
 }
 
 char* toBigEndian(char* bytes, unsigned int val, int n) {
