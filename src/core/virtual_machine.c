@@ -54,12 +54,17 @@ VirtualMachine* buildVm(arguments* args, int sizes[]) {
 void createVm(VirtualMachine* vm, int sizes[], int memorySize, int entryPoint, char* codeSegmentContent, char* constSegmentContent, char** paramSegmentContent, int paramsAmount) { 
     int reg[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
-    if(sizes[0] > 0)
-       setParamContentInMemory(vm, memorySize, paramSegmentContent, sizes[0], paramsAmount);
+    // printf("entrypoint: %08X \n",entryPoint);
+    // printf("esta en crear la vm\n");
+    // printf("cantidad de parametros: %d\n",paramsAmount);
+    // printf("parametro: %s \n",paramSegmentContent[0]);
 
     createSegmentTable(&vm->segment_table, memorySize);
     initSegmentTable(&vm->segment_table, sizes, reg); 
     setSTRegisters(vm, reg, entryPoint, sizes[0] - (paramsAmount*4)); //i send the size of the params minus the size of the pointers
+    
+    if(sizes[0] > 0)
+        setParamContentInMemory(vm, memorySize, paramSegmentContent, sizes[0], paramsAmount);
 
     vmSetUp(vm, GO_MODE);
 
@@ -67,7 +72,7 @@ void createVm(VirtualMachine* vm, int sizes[], int memorySize, int entryPoint, c
         setMemoryContent(vm, memorySize, constSegmentContent, sizes[1], vm->registers[KS]);
     setMemoryContent(vm, memorySize, codeSegmentContent, sizes[2], vm->registers[CS]); // !
 
-
+    // printf("Memory Dump:\n");
     int total = vm->segment_table.descriptors[ vm->segment_table.counter-1 ].base +
                 vm->segment_table.descriptors[ vm->segment_table.counter-1 ].size;
     // for (int i = 0; i < 100; i++)
@@ -102,7 +107,6 @@ void initializeStack( VirtualMachine* vm, int entryPoint, int argc, int argv ) {
 
 
 void setParamContentInMemory(VirtualMachine* virtualM, int memorySize, char** paramsContent, int paramSegmentSize, int paramsAmount) {
-    return;
     int pointers[paramsAmount];
     int previousSize = 0;
     int i;
@@ -118,20 +122,35 @@ void setParamContentInMemory(VirtualMachine* virtualM, int memorySize, char** pa
     int pos = paramsAmount;
     for( i = 0; i < paramsAmount; i++){ // paso los punteros a string (tal vez es innecesario, puede verse)
         toBigEndian(cad, pointers[i], 4);
-        
+        printf("entra al for \n");
+        paramsContent[pos] = malloc (4);
         for( int j = 0; j < 4; j++)
             paramsContent[pos][j] = cad[j];
-        
         pos++;
     }
+    
+    size_t offset = 0;
+    // for (i = 0; i < paramsAmount; i++) { //es paramsamount porque es la cantidad de strings
+    //     printf("en paramsContent: %s \n",paramsContent[i]);
+    //     strcpy(psContent + offset, paramsContent[i]);
+    //     printf("en psContent: %s \n",psContent[i]);
+    //     offset += strlen(paramsContent[i]) + 1; // +1 por el '\0'
+    // }    
 
-    int offset = 0;
-    for (i = 0; i < paramsAmount; i++) { //es paramsamount porque es la cantidad de strings
-        strcpy(psContent + offset, paramsContent[i]);
-        offset += strlen(paramsContent[i]) + 1; // +1 por el '\0'
+    // Para los primeros strings:
+    for (i = 0; i < paramsAmount; i++) {
+        size_t len = strlen(paramsContent[i]) + 1;
+        memcpy(psContent + offset, paramsContent[i], len);
+        offset += len;
     }
 
-    setMemoryContent(virtualM, memorySize, psContent, paramSegmentSize, virtualM->registers[PS]);
+    // Para los punteros en binario (4 bytes c/u)
+    for (i = paramsAmount; i < pos; i++) {
+        memcpy(psContent + offset, paramsContent[i], 4);
+        offset += 4;
+    }
+
+    setMemoryContent(virtualM, memorySize, psContent, paramSegmentSize, 0);
 
     free(psContent);
 }
