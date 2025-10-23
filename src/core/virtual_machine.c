@@ -25,7 +25,7 @@ VirtualMachine* buildVm(arguments* args, int sizes[]) {
     VirtualMachine* virtualM = (VirtualMachine*) malloc(sizeof(VirtualMachine));
     
     char* codeSegmentContent;
-    int entryPoint = 0;
+    int entryPoint = -1;
     char* constSegmentContent;
     int regs[32]; //only for the vmi, kind of wasteful but easier this way
     int segs[8];
@@ -86,7 +86,7 @@ void createVm(VirtualMachine* vm, int sizes[], int memorySize, int entryPoint, c
 }
 
 void initializeStack( VirtualMachine* vm, int entryPoint, int argc, int argv ) {
-    if (entryPoint == 0) 
+    if (entryPoint == -1) 
         return;
 
     if (vm->registers[SS] == -1) 
@@ -196,6 +196,7 @@ void setSTRegisters(VirtualMachine* virtualM, int reg[], int entryPoint, int par
     registers[ES] = reg[4];
     registers[SS] = reg[5];
 
+    entryPoint = entryPoint == -1 ? 0 : entryPoint;
     registers[IP] = (registers[CS] & 0xFFFF0000) | (entryPoint & 0x0000FFFF);
     // here we have to set SP to the bottom of the stack segment
     // something like: registers[SP] = (registers[SS] & (virtualM->segment_table[ registers[SS] >> 16 ]).size)  mari: has to be or 'cause it would be all zeros otherwise
