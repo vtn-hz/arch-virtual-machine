@@ -23,7 +23,7 @@ int spreadSign(int number, int spreadSize) {
 }
 
 int extractOperationSector(int operand) {
-    return applyMaskAfter(operand, 0x3, 6);
+    return applyMaskAfter(operand, 0b11, 6);
 }
 
 int extractRegisterId(int operand) {
