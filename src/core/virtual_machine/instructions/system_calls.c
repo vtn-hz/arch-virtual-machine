@@ -139,5 +139,8 @@ void systemCallClrScreen(VirtualMachine* vm) {
 }
 
 void systemCallBreakpoint(VirtualMachine* vm) {
+    if (vm->mode == QUIT_MODE) 
+        return;
+        
     vm->mode = DEBUG_MODE;
 }
