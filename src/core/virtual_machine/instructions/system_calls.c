@@ -95,6 +95,33 @@ void systemCallWrite(VirtualMachine *vm) {
     }
 }
 
+void parseInputString(unsigned char* buffer, int limit) {
+    int i = 0;
+    int j = 0;
+
+    while( buffer[i] != '\n' && j < limit ) {
+        if (buffer[i] == '\\') {
+            switch( buffer[i+1] ) {
+                case 'n':
+                    buffer[j] = '\n';
+                    i++;
+                break;
+                case 't':
+                    buffer[j] = '\t';
+                    i++;
+                break;  
+                default:
+                    buffer[j] = buffer[i];
+            }            
+        }else
+            buffer[j] = buffer[i];
+
+        j++; i++;
+    }
+
+    buffer[j] = '\0';
+}
+
 void systemCallStringRead(VirtualMachine* vm) {
     int saveLocation = transformLogicalAddress(vm->segment_table, vm->registers[EDX]);
     int limit = vm->registers[ECX];
@@ -108,10 +135,12 @@ void systemCallStringRead(VirtualMachine* vm) {
     fflush(stdout);
 
     unsigned char buffer[BUFFER_SIZE];
-    fgets((char*) buffer, hasLimit ? limit + 1 : sizeof(buffer), stdin);
+    fgets((char*) buffer, BUFFER_SIZE, stdin);
+    
+    parseInputString(buffer, hasLimit ? limit : sizeof(buffer));
 
     int offset = 0;
-    while( buffer[offset] != '\0' &&  buffer[offset] != '\n' ) {
+    while( buffer[offset] != '\0' ) {
         prepareSetMemoryAccess(vm, EDX, offset, buffer[offset], 1);
         commitSetMemoryAccess(vm);
         offset++;
