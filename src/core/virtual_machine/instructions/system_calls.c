@@ -131,7 +131,7 @@ void systemCallStringWrite(VirtualMachine* vm) {
         buffer[offset] = commitGetMemoryAccess(vm);
     } while(buffer[offset++] != '\0');
 
-    printf("[%04X]: %s\n", readLocation, buffer);
+    printf("[%04X]: %s", readLocation, buffer);
 }
 
 void systemCallClrScreen(VirtualMachine* vm) {
