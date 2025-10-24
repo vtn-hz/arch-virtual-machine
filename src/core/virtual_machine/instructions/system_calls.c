@@ -59,7 +59,7 @@ void systemCallRead(VirtualMachine *vm) {
     for (int i = 0; i < quantity; i++) {
         prepareMemoryAccessHandler(vm, EDX, i*size, size);
 
-        printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
+        printf(" [%04X]: ", vm->registers[MAR] & 0xFFFF);
         int value = reader();
         
         prepareMBRHandler(vm, value);
@@ -81,7 +81,7 @@ void systemCallWrite(VirtualMachine *vm) {
         prepareGetMemoryAccess(vm, EDX, i*size, size);
         int value = commitGetMemoryAccess(vm);
         
-        printf("[%04X]: ", vm->registers[MAR] & 0xFFFF);
+        printf(" [%04X]: ", vm->registers[MAR] & 0xFFFF);
         for (int j = 0; j < count; j++) {
             if (j > 0) printf(" ");
 
@@ -97,14 +97,15 @@ void systemCallWrite(VirtualMachine *vm) {
 
 void systemCallStringRead(VirtualMachine* vm) {
     int saveLocation = transformLogicalAddress(vm->segment_table, vm->registers[EDX]);
-    int limit = spreadSign(vm->registers[ECX] & 0xFFFF, 16);
+    int limit = vm->registers[ECX];
     
     if (limit < -1)
         error_handler.buildError("Error: limite invalido para lectura de string");
     
     int hasLimit = limit != -1;
 
-    printf("[%04X]: ", saveLocation);
+    printf(" [%04X]: ", saveLocation);
+    fflush(stdout);
 
     unsigned char buffer[BUFFER_SIZE];
     fgets((char*) buffer, hasLimit ? limit + 1 : sizeof(buffer), stdin);
@@ -131,7 +132,7 @@ void systemCallStringWrite(VirtualMachine* vm) {
         buffer[offset] = commitGetMemoryAccess(vm);
     } while(buffer[offset++] != '\0');
 
-    printf("[%04X]: %s", readLocation, buffer);
+    printf(" [%04X]: %s", readLocation, buffer);
 }
 
 void systemCallClrScreen(VirtualMachine* vm) {
