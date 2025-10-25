@@ -15,6 +15,8 @@
 
 #include "vm_mode.h"
 
+#include "vm_image.h"
+
 int isSegmentCodeEnded(VirtualMachine*);
 
 void prepareInstruction(VirtualMachine*);
@@ -29,7 +31,8 @@ void virtualMachineRun(VirtualMachine* virtualM, arguments args) {
     while (!isSegmentCodeEnded(virtualM)) {
 
         if ( isDebugMode(virtualM, args) ) {
-            solveDebugAction(virtualM, args, askDebugAction());
+            buildImage(virtualM, args);
+            solveDebugAction(virtualM, args);
         }
       
         prepareInstruction(virtualM);

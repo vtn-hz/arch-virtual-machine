@@ -30,12 +30,12 @@ char askDebugAction() {
     return c;
 }
 
-void solveDebugAction(VirtualMachine* vm, arguments args, char action) {
-    vm->mode = action;
+void solveDebugAction(VirtualMachine* vm, arguments args) {
+    vm->mode = askDebugAction();
 
-    switch(vm->mode) {
-        case DEBUG_MODE: buildImage(vm, args); break;
- 
-        case QUIT_MODE:  exit(EXIT_SUCCESS);    break;
+    switch (vm->mode) {
+        case QUIT_MODE: exit(EXIT_SUCCESS); break;
+        case DEBUG_MODE:                    break;
+        case GO_MODE:                       break;
     }
-}  
+}
