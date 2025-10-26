@@ -151,8 +151,6 @@ void systemCallStringRead(VirtualMachine* vm) {
 }
 
 void systemCallStringWrite(VirtualMachine* vm) {
-    int readLocation = transformLogicalAddress(vm->segment_table, vm->registers[EDX]);
-
     unsigned char buffer[BUFFER_SIZE];
     int offset = 0;
     
@@ -161,7 +159,7 @@ void systemCallStringWrite(VirtualMachine* vm) {
         buffer[offset] = commitGetMemoryAccess(vm);
     } while(buffer[offset++] != '\0');
 
-    printf(" [%04X]: %s", readLocation, buffer);
+    printf(" %s", buffer);
 }
 
 void systemCallClrScreen(VirtualMachine* vm) {
