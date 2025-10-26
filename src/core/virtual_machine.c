@@ -92,17 +92,9 @@ void initializeStack( VirtualMachine* vm, int entryPoint, int argc, int argv ) {
     if (vm->registers[SS] == -1) 
         return;
 
-    vm->registers[SP] -= 4;
-    prepareSetMemoryAccess(vm, SP, 0, argv, DEFAULT_ACCESS_SIZE); // vm->registers[PS] could be sent instead of argv
-    commitSetMemoryAccess(vm);
-    
-    vm->registers[SP] -= 4;
-    prepareSetMemoryAccess(vm, SP, 0, argc, DEFAULT_ACCESS_SIZE);
-    commitSetMemoryAccess(vm);
-
-    vm->registers[SP] -= 4;
-    prepareSetMemoryAccess(vm, SP, 0, -1, DEFAULT_ACCESS_SIZE);
-    commitSetMemoryAccess(vm);
+    executeDataPush(vm, argv); // vm->registers[PS] could be sent instead of argv
+    executeDataPush(vm, argc);
+    executeDataPush(vm, -1);
 }
 
 

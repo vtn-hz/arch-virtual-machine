@@ -87,6 +87,16 @@ void commitSetMemoryAccess(VirtualMachine* vm) {
     }
 }
 
+void executeDataPush(VirtualMachine *vm, int data) {
+    vm->registers[SP] -= 4; 
+
+    if (!isLogicalAddressValid(vm->segment_table, vm->registers[SP])) 
+        error_handler.stackOverflow();
+
+    prepareSetMemoryAccess(vm, SP, 0, data, DEFAULT_ACCESS_SIZE);
+    commitSetMemoryAccess(vm);    
+}
+
 void setDataToEmpty(VirtualMachine* vm, int operand, int value) {
     error_handler.emptyOperand();
 }

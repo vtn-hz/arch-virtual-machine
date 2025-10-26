@@ -89,6 +89,16 @@ int commitGetMemoryAccess(VirtualMachine* vm) {
     return vm->registers[MBR];
 }
 
+int executeDataPop(VirtualMachine *vm) {
+    if (!isLogicalAddressValid(vm->segment_table, vm->registers[SP])) 
+        error_handler.stackUnderflow();
+
+    prepareGetMemoryAccess(vm, SP, 0, DEFAULT_ACCESS_SIZE);
+    vm->registers[SP] += 4;
+
+    return commitGetMemoryAccess(vm);
+}
+
 int getDataFromEmpty(VirtualMachine* vm, int operand) {
     error_handler.emptyOperand();
     return 0;

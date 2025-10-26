@@ -274,58 +274,22 @@ void NOT(VirtualMachine* vm) {
 
 void PUSH(VirtualMachine* vm) {
     int data = getData(vm, vm->registers[OP1]);
-    vm->registers[SP] -= 4; 
-
-    if (!isLogicalAddressValid(vm->segment_table, vm->registers[SP])) 
-        error_handler.stackOverflow();
-
-    /*
-
-        Cada vez que se realiza una operación en la memoria, se debe cargar en el registro LAR la dirección
-        lógica a la que se quiere acceder y la cantidad de bytes en la parte alta del registro MAR (los 2 bytes más
-        significativos). Luego de realizar la traducción a una dirección física, el resultado debe almacenarse en la
-        parte baja del registro MAR (los 2 bytes menos significativos). En el registro MBR debe quedar el valor con
-        el cual se está operando, ya sea el valor que se desea almacenar en el caso de una escritura o el que se
-        obtuvo después de la lectura. La lectura de la instrucción no debe modificar ninguno de estos registros.
-
-        valen:   yo interpreto que "cada vez que se realiza una operación en la memoria" 
-                 significa que es cualquier acceso a memoria (STACK INCLUÍDO)
-    */ 
-    prepareSetMemoryAccess(vm, SP, 0, data, DEFAULT_ACCESS_SIZE);
-    commitSetMemoryAccess(vm);
+    executeDataPush(vm, data);
 }
 
 void POP(VirtualMachine* vm) {
-    
-    if (!isLogicalAddressValid(vm->segment_table, vm->registers[SP])) 
-        error_handler.stackUnderflow();
-
-    prepareGetMemoryAccess(vm, SP, 0, DEFAULT_ACCESS_SIZE);
-    setData(vm, vm->registers[OP1], commitGetMemoryAccess(vm));
-    
-    vm->registers[SP] += 4;
+    int data = executeDataPop(vm);
+    setData(vm, vm->registers[OP1], data);
 }
 
 void CALL(VirtualMachine* vm) {
     int data = getData(vm, vm->registers[OP1]);
-
-    vm->registers[SP] -= 4;
-    if (!isLogicalAddressValid(vm->segment_table, vm->registers[SP])) 
-        error_handler.stackOverflow();
-
-    prepareSetMemoryAccess(vm, SP, 0, vm->registers[IP], DEFAULT_ACCESS_SIZE);
-    commitSetMemoryAccess(vm);
+    executeDataPush(vm, vm->registers[IP]);
 
     vm->registers[IP] = vm->registers[CS] | (data & 0xFFFF);
 }
 
 void RET(VirtualMachine* vm) {
-
-    if (!isLogicalAddressValid(vm->segment_table, vm->registers[SP])) 
-        error_handler.stackUnderflow();
-
-    prepareGetMemoryAccess(vm, SP, 0, DEFAULT_ACCESS_SIZE);
-    vm->registers[IP] = commitGetMemoryAccess(vm);
-
-    vm->registers[SP] += 4;
+    int data = executeDataPop(vm);
+    vm->registers[IP] = data;
 }
