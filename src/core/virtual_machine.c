@@ -114,7 +114,6 @@ void setParamContentInMemory(VirtualMachine* virtualM, int memorySize, char** pa
     int pos = paramsAmount;
     for( i = 0; i < paramsAmount; i++){ // paso los punteros a string (tal vez es innecesario, puede verse)
         toBigEndian(cad, pointers[i], 4);
-        printf("entra al for \n");
         paramsContent[pos] = malloc (4);
         for( int j = 0; j < 4; j++)
             paramsContent[pos][j] = cad[j];
