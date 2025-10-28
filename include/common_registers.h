@@ -13,6 +13,8 @@ enum CommonRegisters {
     OPC = 4,
     OP1 = 5,
     OP2 = 6,
+    SP  = 7,
+    BP  = 8,
     EAX = 10,
     EBX = 11,
     ECX = 12,
@@ -22,7 +24,11 @@ enum CommonRegisters {
     AC  = 16,
     CC  = 17,
     CS  = 26,
-    DS  = 27
+    DS  = 27,
+    ES  = 28,
+    SS  = 29,
+    KS  = 30,
+    PS  = 31
 };
 
 #endif

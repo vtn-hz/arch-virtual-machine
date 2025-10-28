@@ -9,8 +9,8 @@ const char* REGISTERS_STR[32] = {
     "OPC", // 0x04
     "OP1", // 0x05
     "OP2", // 0x06
-    NULL,  // 0x07
-    NULL,  // 0x08
+    "SP",  // 0x07
+    "BP",  // 0x08
     NULL,  // 0x09
     "EAX", // 0x0A
     "EBX", // 0x0B
@@ -30,8 +30,17 @@ const char* REGISTERS_STR[32] = {
     NULL,  // 0x19
     "CS",  // 0x1A
     "DS",  // 0x1B
-    NULL,  // 0x1C
-    NULL,  // 0x1D
-    NULL,  // 0x1E
-    NULL,  // 0x1F
+    "ES",  // 0x1C
+    "SS",  // 0x1D
+    "KS",  // 0x1E
+    "PS",  // 0x1F
+};
+
+const char* REGISTERS_STR_SECTOR[6][4] = {
+  {"EAX", "AL", "AH", "AX"},
+  {"EBX", "BL", "BH", "BX"},
+  {"ECX", "CL", "CH", "CX"},
+  {"EDX", "DL", "DH", "DX"},
+  {"EEX", "EL", "EH", "EX"},
+  {"EFX", "FL", "FH", "FX"}
 };

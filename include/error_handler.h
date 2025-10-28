@@ -11,6 +11,9 @@ void emptyOperand();
 void segmentationFault(int);
 void divisionByZero(int, int);
 
+void stackOverflow();
+void stackUnderflow();
+
 void buildError(const char* context, ...);
 
 typedef void (*p_void_error_handler)(void);
@@ -29,6 +32,9 @@ typedef struct {
 
     p_int_error_handler segmentationFault;
     p_int_int_error_handler divisionByZero;
+
+    p_void_error_handler stackOverflow;
+    p_void_error_handler stackUnderflow;
 
     p_custom_error_handler buildError;
 } ErrorHandler;

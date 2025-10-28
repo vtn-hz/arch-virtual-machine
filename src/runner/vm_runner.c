@@ -13,14 +13,28 @@
 
 #include "mnemonics_str.h"
 
+#include "vm_mode.h"
+
+#include "vm_image.h"
+
 int isSegmentCodeEnded(VirtualMachine*);
 
 void prepareInstruction(VirtualMachine*);
 void advanceInstructionPointer(VirtualMachine*);
 void executeInstruction(VirtualMachine*);
 
-void virtualMachineRun(VirtualMachine* virtualM) {
+void virtualMachineRun(VirtualMachine* virtualM, arguments args) {
+
+    // printf("IP: %08X", virtualM->registers[IP]);
+    // printf(" | %d ", !isSegmentCodeEnded(virtualM));
+    // printf(" | %d ", isDebugMode(virtualM, args) );
     while (!isSegmentCodeEnded(virtualM)) {
+
+        if ( isDebugMode(virtualM, args) ) {
+            buildImage(virtualM, args);
+            solveDebugAction(virtualM, args);
+        }
+      
         prepareInstruction(virtualM);
         advanceInstructionPointer(virtualM);
         executeInstruction(virtualM);  

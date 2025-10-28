@@ -10,9 +10,12 @@ typedef struct {
 typedef struct {
     ST descriptors[DST_MAX];
     unsigned short counter;
+    int available_memory;
 } DST;
 
-void initSegmentTable(DST* tableSegment);
+void createSegmentTable(DST* table, int memorySize);
+
+void initSegmentTable(DST* table, int sizes[], int reg[]);
 
 /**
  * Converts a logical address to a physical address using

@@ -1,0 +1,4 @@
+ejercicio,run_params,status,error
+"params","-d -p some params","ok",""
+"list_main", "-d","ok",""
+"tree_main", "-d","ok",""

@@ -32,6 +32,14 @@ void divisionByZero(int a, int b) {
     buildError("Error: {%d}/{%d} división por cero", a, b);
 }
 
+void stackOverflow() {
+    buildError("Error: desbordamiento de pila");
+}
+
+void stackUnderflow() {
+    buildError("Error: subdesbordamiento de pila");
+}
+
 void buildError(const char* context, ...) {
     va_list args;
     va_start(args, context);
@@ -51,6 +59,9 @@ ErrorHandler error_handler = {
     
     segmentationFault, 
     divisionByZero,
+
+    stackOverflow,
+    stackUnderflow,
 
     buildError
 };

@@ -15,9 +15,22 @@ void printMnemonic(int opCode);
 
 void printOperand(int operand, int opCode);
 
+void printInstruction(VirtualMachine* vm);
+
+void rawInstructionPrint(VirtualMachine* vm, int entryPoint);
+
 void printOperandRegister   (int operand);
+
 void printOperandInmmediate (int operand, int opCode);
+
 void printOperandMemory     (int operand); 
+
+void printVirtualMachineState(VirtualMachine* vm, int entryPoint) {
+    rawInstructionPrint(vm, entryPoint);
+    printf(" | ");
+    printInstruction(vm);
+    printf("\n");
+}
 
 void printInstruction(VirtualMachine* vm) {
     int opCode = vm->registers[OPC];
@@ -60,7 +73,7 @@ void printOperand(int operand, int opCode) {
 }
 
 void printOperandRegister(int operand) {
-    int registerCode = extractOperationValue(operand);
+    int registerCode = extractRegisterId(operand);
 
     if (registerCode < 0 || registerCode > 31)
         error_handler.buildError("Error: {%x} es registro invalido ", registerCode);
@@ -68,7 +81,15 @@ void printOperandRegister(int operand) {
     if (REGISTERS_STR[registerCode] == NULL)
         error_handler.buildError("Error: {%x} es registro invalido ", registerCode);
 
-    printf("%10s", REGISTERS_STR[registerCode]);
+    char *registerStr;
+    if ( registerCode >= 10 && registerCode <= 15 ) {
+        int sector = extractOperationSector(operand);
+        registerStr = (char*) REGISTERS_STR_SECTOR[registerCode - 10][sector];
+    }else 
+        registerStr = (char*) REGISTERS_STR[registerCode];
+    
+
+    printf("%10s", registerStr);
 }
 
 void printOperandInmmediate(int operand, int opCode) {
@@ -83,6 +104,7 @@ void printOperandInmmediate(int operand, int opCode) {
 }
 
 void printOperandMemory(int operand) {
+    int tagId        = extractOperationCellSize(operand);
     int registerCode = extractOperationBaseRegister(operand);
     int offset       = extractOperationValue(operand); 
 
@@ -92,13 +114,44 @@ void printOperandMemory(int operand) {
     if (REGISTERS_STR[registerCode] == NULL)
         error_handler.buildError("Error: {%x} registro es invalido ", registerCode);
 
+    const char* sizeTags[4] = {"", NULL, "w", "b"};
     char buffer[64];
+
     if (offset != 0) {
         char sign = offset > 0 ? '+' : '-';
         offset = offset > 0 ? offset : -offset;
-        sprintf(buffer, "[%s %c %d]", REGISTERS_STR[registerCode], sign, offset);
+        sprintf(buffer, "%s[%s %c %d]", sizeTags[tagId], REGISTERS_STR[registerCode], sign, offset);
     } else
-        sprintf(buffer, "[%s]", REGISTERS_STR[registerCode]);
+        sprintf(buffer, "%s[%s]", sizeTags[tagId], REGISTERS_STR[registerCode]);
 
     printf("%10s", buffer);
+}
+
+void rawInstructionPrint(VirtualMachine* vm, int entryPoint) {
+    int marginLeft = 7;
+    int opaSize = extractOperationType(vm->registers[OP1]);
+    int opbSize = extractOperationType(vm->registers[OP2]);
+    int opcSize = 1;
+
+    if (opaSize < 0 || opaSize > 3) 
+        error_handler.invalidOperand(opaSize);
+
+    if (opbSize < 0 || opbSize > 3) 
+        error_handler.invalidOperand(opbSize);
+
+    int totalSize = opcSize + opaSize + opbSize;
+    int fisicIp = transformLogicalAddress(vm->segment_table, vm->registers[IP]);
+
+    if (entryPoint != (vm->registers[IP]))
+        printf(" ");
+    else
+        printf(">");
+
+    printf("[%04X]", fisicIp);
+    for(int i=fisicIp; i < fisicIp + totalSize ; i++) 
+        printf(" %02X", vm->memory[i]);
+    
+    int bytesRestantes = marginLeft - totalSize;
+    for(int i=0; i < bytesRestantes ; i++) 
+        printf("   ");    
 }
