@@ -159,10 +159,6 @@ void restoreVm(VirtualMachine* vm, arguments* args, char* fileContent, int regs[
         if(segs[i]!= -1)
             addSegment(&vm->segment_table, segs[i] & 0xFFFF);
 
-    int mem =  
-        vm->segment_table.descriptors[vm->segment_table.counter - 1].base + 
-        vm->segment_table.descriptors[vm->segment_table.counter - 1].size; // calculate memory size from segments, divide by 1024 to get in KB and follow the format
-    args->memory_size = 16;
     vm->memory = (unsigned char*) malloc(args->memory_size * 1024);
 
     for (int i = 0; i < args->memory_size*1024; i++)
