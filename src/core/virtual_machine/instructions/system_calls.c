@@ -123,7 +123,6 @@ void parseInputString(unsigned char* buffer, int limit) {
 }
 
 void systemCallStringRead(VirtualMachine* vm) {
-    int saveLocation = transformLogicalAddress(vm->segment_table, vm->registers[EDX]);
     int limit = vm->registers[ECX];
     
     if (limit < -1)
@@ -131,7 +130,7 @@ void systemCallStringRead(VirtualMachine* vm) {
     
     int hasLimit = limit != -1;
 
-    printf(" [%04X]: ", saveLocation);
+    printf(" ");
     fflush(stdout);
 
     unsigned char buffer[BUFFER_SIZE];

@@ -37,7 +37,12 @@ void printParsedConstantItem(VirtualMachine *vm, int kfisicPointer) {
     printf("\"");
     while( vm->memory[kfisicPointer] ) {
         char c = (char) vm->memory[kfisicPointer];
-        printf( c >= 32 && c < 128 ? "%c" : "." , c);
+        if ( c == '\n')     
+            printf("\\n");
+        else if ( c == '\t' ) 
+            printf("\\t"); 
+        else 
+            printf( c >= 32 && c < 128 ? "%c" : "." , c);
         kfisicPointer++;
     }
     printf("\"");
